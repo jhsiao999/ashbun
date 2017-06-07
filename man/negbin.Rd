@@ -2,12 +2,7 @@
 % Please edit documentation in R/fit-various-dist-for-zeros.r
 \name{negbin}
 \alias{negbin}
-\title{Fit Negative binomial to gene expression counts
-(univariate)}
+\title{Fit Negative binomial to gene expression counts (univariate)}
 \usage{
 negbin(counts, group, norm_factor = NULL)
-}
-\description{
-Fit Negative binomial to gene expression counts
-(univariate)
 }

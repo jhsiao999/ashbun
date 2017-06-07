@@ -12,6 +12,8 @@
 #' @param Ngene Number of genes in the simulated dataset.
 #' @param Nsamp Number of samples per condition in the simulated data.
 #' @param nullpi Proportion of null genes.
+#'
+#' @export
 makeSimCount2groups <- function(counts, Ngene = NULL, Nsamp,
                               sample_method = c("per_gene", "all_genes"),
                               control = list(pi0 = NULL)){
@@ -63,6 +65,8 @@ makeSimCount2groups <- function(counts, Ngene = NULL, Nsamp,
 #'
 #' @param count_onegene Count vector of one gene.
 #' @param Nsamp Total number of samples in the simulated data (both conditions included).
+#'
+#' @export
 sampleingene <- function(count_onegene, Nsamp){
   sample_subset <- sample(length(count_onegene), Nsamp)
   return(c(count_onegene[sample_subset]))
@@ -75,6 +79,7 @@ sampleingene <- function(count_onegene, Nsamp){
 #'  - betaargs: parameters for the normal mixture distribution to generate signals
 #'  - pi0: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)
 #'
+#' @export
 non_null_sim <- function(counts, args){
   # Thinned effect sizes generated from normal mixture prior
   ngene <- dim(counts)[1]
@@ -101,6 +106,8 @@ non_null_sim <- function(counts, args){
 #'
 #' @return null Binary vector of length ngene. 1 = null, 0 = no null.
 #' @return scalar value pi0 proportion of null
+#'
+#' @export
 make_normalmix = function(ngene, pi, mu, sd, pi0){
   if (pi0=="random"){
     pi0 = runif(1,0,1) #generate the proportion of true nulls randomly
@@ -118,6 +125,8 @@ make_normalmix = function(ngene, pi, mu, sd, pi0){
 #' @param log2foldchanges Prior distribution of the betas (true effects).
 #'
 #' @return counts A simulated count matrix of non-null and null genes.
+#'
+#' @export
 pois_thinning = function(counts, log2foldchanges){
   nsamp = dim(counts)[2]/2
   null = (log2foldchanges==0)
@@ -141,27 +150,40 @@ pois_thinning = function(counts, log2foldchanges){
 }
 
 
-# spiky prior
+#' @title spiky prior
+#'
+#' @export
 args.spiky <- function(nsamp, pi0 = "random") {
   list(pi0=pi0,
        betaargs=list(betapi=c(.4,.2,.2,.2),betamu=c(0,0,0,0),betasd=c(.25,.5,1,2)/sqrt(2*nsamp-2)))
 }
 
+#' @title near normal prior
+#' @export
 args.near_normal <- function(nsamp, pi0 = "random") {
   list(pi0=pi0,
        betaargs=list(betapi=c(2/3,1/3),betamu=c(0,0),betasd=c(1,2)/sqrt(2*nsamp-2)))
 }
 
+#' @title flat top prior
+#'
+#' @export
 args.flat_top <- function(nsamp, pi0 = "random") {
   list(pi0=pi0,
        betaargs=list(betapi=rep(1/7,7),betamu=c(-1.5,-1,-0.5,0,0.5,1,1.5),betasd=rep(0.5,7)/sqrt(2*nsamp-2)))
 }
 
+#' @title big normal prior
+#'
+#' @export
 args.big_normal <- function(nsamp, pi0 = "random") {
   list(pi0=pi0,
        betaargs=list(betapi=c(1),betamu=c(0),betasd=c(4)/sqrt(2*nsamp-2)))
 }
 
+#' @title bimodal prior
+#'
+#' @export
 args.bimodal <- function(nsamp, pi0 = "random") {
   list(pi0=pi0,
        betaargs=list(betapi=c(0.5,0.5),betamu=c(-2,2),betasd=c(1,1)/sqrt(2*nsamp-2)))

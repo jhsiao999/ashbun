@@ -1,4 +1,5 @@
-# Hurdle negative binomial
+#' @title Hurdle negative binomial
+#' @export
 negbin_hurdle <- function(df, norm_factor) {
   fit <- try(pscl::hurdle(counts ~ group - 1 + offset(log(norm_factor)) | offset(log(norm_factor)),
                     data = df,
@@ -23,7 +24,9 @@ negbin_hurdle <- function(df, norm_factor) {
 }
 
 
-# Zero-inflated negative binomial
+#' @title Zero-inflated negative binomial
+#'
+#' @export
 negbin_zif <- function(counts, group, norm_factor, control = list(EM = FALSE)) {
 
   # check control list
@@ -69,8 +72,7 @@ negbin_zif <- function(counts, group, norm_factor, control = list(EM = FALSE)) {
 
 
 
-#' Fit Negative binomial to gene expression counts
-#' (univariate)
+#' @title Fit Negative binomial to gene expression counts (univariate)
 #'
 #' @export
 #'

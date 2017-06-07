@@ -11,6 +11,7 @@
 #'
 #' @example
 #' ## objectNormed <- normalize.TMM(zeisel_cortex_subset)
+#' @export
 methodWrapper.limmaVoom <- function(object, condition, W=NULL){
 
   if (is.null(W)){
@@ -42,7 +43,7 @@ methodWrapper.limmaVoom <- function(object, condition, W=NULL){
 #' @param cdr cellular detection rate, computed as \code{scale(colSums(counts > 0))} where counts is raw expression count matrix.
 #'
 #' @return p.value significance value from likelihood ratio test.
-
+#' @export
 methodWrapper.mast <- function(object, condition, cdr) {
 
   # Check column names of log2counts;

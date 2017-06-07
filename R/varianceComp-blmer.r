@@ -15,7 +15,7 @@
 #' anno_filter <- get(load("annotation-filter.txt"))
 #' blme_final <- gene_variation(counts = molecules_final,
 #'                              annotation = anno_filter)
-
+#' @export
 gene_variation <- function(counts, annotation) {
 
   individual <- as.factor(annotation$individual)
