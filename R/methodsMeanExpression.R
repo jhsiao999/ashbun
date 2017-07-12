@@ -2,7 +2,6 @@
 
 
 
-
 #' @title voom + limma
 #'
 #' @param object gene by sample expression matrix. Can be
