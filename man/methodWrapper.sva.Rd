@@ -4,10 +4,10 @@
 \alias{methodWrapper.sva}
 \title{Surrogate Variable Analysis}
 \usage{
-methodWrapper.sva(object, condition, num_sv)
+methodWrapper.sva(count_matrix, design_matrix, num_sv)
 }
 \arguments{
-\item{object}{gene by sample expression matrix. Can be}
+\item{count_matrix}{gene by sample expression matrix. Can be}
 
-\item{condition}{Binary vector of length N indicating sample biological condition.}
+\item{design_matrix}{Binary vector of length N indicating sample biological condition.}
 }

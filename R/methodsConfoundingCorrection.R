@@ -17,18 +17,19 @@ methodWrapper.num_sv <- function(object, condition) {
 
 #' @title Surrogate Variable Analysis
 #'
-#' @param object gene by sample expression matrix. Can be
-#' @param condition Binary vector of length N indicating sample biological condition.
+#' @param count_matrix gene by sample expression matrix. Can be
+#' @param design_matrix Binary vector of length N indicating sample biological condition.
 #' @num_sv number of surrogate variables
 #'
 #' @export
-methodWrapper.sva <- function(object, condition, num_sv){
+methodWrapper.sva <- function(count_matrix, design_matrix, num_sv){
 
-  Y <- t(object)
+  Y <- count_matrix
+  X <- design_matrix
 
-  trash     <- capture.output(sva_out <- sva::sva(dat = t(Y), mod = X, n.sv = num_sv))
+  trash     <- capture.output(sva_out <- sva::sva(dat = Y, mod = X, n.sv = num_sv))
   X.sv      <- cbind(X, sva_out$sv)
-  limma_out <- limma::lmFit(object = t(Y), design = X.sv)
+  limma_out <- limma::lmFit(object = Y, design = X.sv)
   limma.ebayes <- limma::eBayes(limma_out)
   betahat <- limma.ebayes$coefficients[,2]
   sebetahat <- with(limma.ebayes, stdev.unscaled[,2]*sigma)
