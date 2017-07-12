@@ -24,12 +24,6 @@ methodWrapper.num_sv <- function(object, condition) {
 #' @export
 methodWrapper.sva <- function(object, condition, num_sv){
 
-  if (is.null(W)){
-    X <- model.matrix(~condition)
-  }else{
-    X <- model.matrix(~condition+W)
-  }
-
   Y <- t(object)
 
   trash     <- capture.output(sva_out <- sva::sva(dat = t(Y), mod = X, n.sv = num_sv))
