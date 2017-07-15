@@ -177,11 +177,11 @@ args.flat_top <- function(nsamp, pi0 = "random") {
 #'
 #' @param nsamp Number of samples per group
 #' @param betasd Standard deviation of the effect sizes. Input is used to compute standard error: betasd/sqrt(2*nsamp-2).
-#' @param pi0 Fraction of null genes. Default = Random. 
+#' @param pi0 Fraction of null genes. Default = Random.
 #'
 #' @export
 args.big_normal <- function(nsamp, betasd = NULL, pi0 = "random") {
-  if (betasd == NULL) { betasd.0 <- 4/sqrt(2*nsamp-2) }
+  if (is.null(betasd)) { betasd.0 <- 4/sqrt(2*nsamp-2) }
   if (betasd != NULL) { betasd.0 <- betasd}
 
   list(pi0=pi0,
