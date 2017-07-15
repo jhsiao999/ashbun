@@ -176,19 +176,13 @@ args.flat_top <- function(nsamp, pi0 = "random") {
 #' @title big normal prior
 #'
 #' @param nsamp Number of samples per group
-#' @param betasd Standard deviation of the effect sizes. Input is used to compute standard error: betasd/sqrt(2*nsamp-2).
+#' @param betasd Standard deviation of the effect sizes.
 #' @param pi0 Fraction of null genes. Default = Random.
 #'
 #' @export
-args.big_normal <- function(nsamp, betasd = NULL, pi0 = "random") {
-  if (is.null(betasd)) {
-   betasd.0 <- 4/sqrt(2*nsamp-2)
-   } else {
-   betasd.0 <- betasd
-   }
-
+args.big_normal <- function(nsamp, betasd = 1, pi0 = "random") {
   list(pi0=pi0,
-       betaargs=list(betapi=c(1),betamu=c(0),betasd=betasd.0 ))
+       betaargs=list(betapi=c(1),betamu=c(0),betasd=betasd ))
 }
 
 #' @title bimodal prior
