@@ -181,8 +181,11 @@ args.flat_top <- function(nsamp, pi0 = "random") {
 #'
 #' @export
 args.big_normal <- function(nsamp, betasd = NULL, pi0 = "random") {
-  if (is.null(betasd)) { betasd.0 <- 4/sqrt(2*nsamp-2) }
-  if (betasd != NULL) { betasd.0 <- betasd}
+  if (is.null(betasd)) {
+   betasd.0 <- 4/sqrt(2*nsamp-2)
+   } else {
+   betasd.0 <- betasd
+   }
 
   list(pi0=pi0,
        betaargs=list(betapi=c(1),betamu=c(0),betasd=betasd.0 ))
