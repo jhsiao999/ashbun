@@ -4,5 +4,12 @@
 \alias{args.big_normal}
 \title{big normal prior}
 \usage{
-args.big_normal(nsamp, pi0 = "random")
+args.big_normal(nsamp, betasd = NULL, pi0 = "random")
+}
+\arguments{
+\item{nsamp}{Number of samples per group}
+
+\item{betasd}{Standard deviation of the effect sizes. Input is used to compute standard error: betasd/sqrt(2*nsamp-2).}
+
+\item{pi0}{Fraction of null genes. Default = Random.}
 }
