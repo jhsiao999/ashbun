@@ -180,7 +180,7 @@ methodWrapper.edgeR <- function(count_matrix, condition,
   dge <- edgeR::DGEList(counts = count_matrix, 
                         group = condition,
                         genes = rownames(count_matrix),
-                        norm.factors = libsize_factors)
+                        norm.factors = control$libsize_factors)
   
   # estimate dispersion
   dge <- estimateDisp(dge, design = model.matrix(~condition), robust = TRUE)
