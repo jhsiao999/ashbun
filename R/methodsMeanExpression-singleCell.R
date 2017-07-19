@@ -237,6 +237,8 @@ methodWrapper.rots <- function(count_matrix, condition,
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{n.randomization} SCDE internal argument: Nubmer of bootstraps.
 #'   \code{n.cores} SCDE internal argument: Nubmer of cores.
+#'   \code{min.size.entries} SCDE internal argument: Mininum number of genes to use when
+#'                            determining expected expression magnitude during model fitting.
 #'
 #' @return A list with the following objects
 #'    \code{sig_order} Z-socres of expression difference, ordered from the most 
@@ -249,7 +251,8 @@ methodWrapper.rots <- function(count_matrix, condition,
 methodWrapper.scde <- function(count_matrix, condition,
                                control = list(save_modelFit = FALSE,
                                               n.randomizations = 100,
-                                              n.cores = 4)) {
+                                              n.cores = 4,
+                                              min.size.entries = 500)) {
   
   #--------------------------
   # Make sure input format is correct
@@ -269,7 +272,8 @@ methodWrapper.scde <- function(count_matrix, condition,
                                    threshold.segmentation = TRUE, 
                                    save.crossfit.plots = FALSE, 
                                    save.model.plots = FALSE, 
-                                   min.size.entries = 1000, verbose = 0)
+                                   min.size.entries = control$min.size.entries, 
+                                   verbose = 0)
   
   # filter out cells that dont't show positive correlation with
   # the expected expression magnitudes 

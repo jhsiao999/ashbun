@@ -5,7 +5,7 @@
 \title{SCDE}
 \usage{
 methodWrapper.scde(count_matrix, condition, control = list(save_modelFit =
-  FALSE, n.randomizations = 100, n.cores = 4))
+  FALSE, n.randomizations = 100, n.cores = 4, min.size.entries = 500))
 }
 \arguments{
 \item{count_matrix}{Gene by sample expression count matrix (G by N).}
@@ -15,7 +15,9 @@ methodWrapper.scde(count_matrix, condition, control = list(save_modelFit =
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{n.randomization} SCDE internal argument: Nubmer of bootstraps.
-\code{n.cores} SCDE internal argument: Nubmer of cores.}
+\code{n.cores} SCDE internal argument: Nubmer of cores.
+\code{min.size.entries} SCDE internal argument: Mininum number of genes to use when
+                         determining expected expression magnitude during model fitting.}
 }
 \value{
 A list with the following objects

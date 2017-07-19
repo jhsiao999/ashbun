@@ -7,17 +7,17 @@
 # 
 # 
 # 
-# fit <- scde::scde.expression.difference(o.ifm, cd, o.prior, 
-#                                         groups  =  condition, 
-#                                         n.randomizations  =  control$bootstrap_times, 
+# fit <- scde::scde.expression.difference(o.ifm, cd, o.prior,
+#                                         groups  =  condition,
+#                                         n.randomizations  =  control$bootstrap_times,
 #                                         # number of bootstrap randomizations to be performed
 #                                         n.cores  =  control$n_cores, verbose  =  0)
 # 
 # 
 # scde::scde.expression.difference
-# function (models = o.ifm, counts = count_matrix, prior = o.prior, groups = condition, batch = NULL, 
-#           n.randomizations = 150, n.cores = 4, batch.models = models, 
-#           return.posteriors = FALSE, expectation = 0, verbose = 0) 
+# function (models = o.ifm, counts = count_matrix, prior = o.prior, groups = condition, batch = NULL,
+#           n.randomizations = 150, n.cores = 4, batch.models = models,
+#           return.posteriors = FALSE, expectation = 0, verbose = 0)
 # {
 #   if (!all(rownames(models) %in% colnames(counts))) {
 #     stop("ERROR: provided count data does not cover all of the cells specified in the model matrix")
@@ -26,13 +26,13 @@
 #   counts <- as.matrix(counts[, ci])
 #   if (is.null(groups)) {
 #     groups <- as.factor(attr(models, "groups"))
-#     if (is.null(groups)) 
+#     if (is.null(groups))
 #       stop("ERROR: groups factor is not provided, and models structure is lacking groups attribute")
 #     names(groups) <- rownames(models)
 #   }
 #   if (length(levels(groups)) != 2) {
-#     stop(paste("ERROR: wrong number of levels in the grouping factor (", 
-#                paste(levels(groups), collapse = " "), "), but must be two.", 
+#     stop(paste("ERROR: wrong number of levels in the grouping factor (",
+#                paste(levels(groups), collapse = " "), "), but must be two.",
 #                sep = ""))
 #   }
 #   correct.batch <- FALSE
@@ -62,15 +62,15 @@
 #       cat("calculating batch posteriors\n")
 #     }
 #     batch.jpl <- tapply(seq_len(nrow(models)), groups, function(ii) {
-#       scde.posteriors(models = batch.models, counts = counts, 
-#                       prior = prior, batch = batch, composition = table(batch[ii]), 
-#                       n.cores = n.cores, n.randomizations = n.randomizations, 
+#       scde.posteriors(models = batch.models, counts = counts,
+#                       prior = prior, batch = batch, composition = table(batch[ii]),
+#                       n.cores = n.cores, n.randomizations = n.randomizations,
 #                       return.individual.posteriors = FALSE)
 #     })
 #     if (verbose) {
 #       cat("calculating batch differences\n")
 #     }
-#     batch.bdiffp <- calculate.ratio.posterior(batch.jpl[[1]], 
+#     batch.bdiffp <- calculate.ratio.posterior(batch.jpl[[1]],
 #                                               batch.jpl[[2]], prior, n.cores = n.cores)
 #     batch.bdiffp.rep <- quick.distribution.summary(batch.bdiffp)
 #   }
@@ -80,18 +80,18 @@
 #       print(table(as.character(groups)))
 #     }
 #   }
-#   
+# 
 #   jpl <- tapply(seq_len(nrow(models)), groups, function(ii) {
-#     scde.posteriors(models = models[ii, , drop = FALSE], 
-#                     counts = counts[, ii, drop = FALSE], prior = prior, 
+#     scde.posteriors(models = models[ii, , drop = FALSE],
+#                     counts = counts[, ii, drop = FALSE], prior = prior,
 #                     n.cores = n.cores, n.randomizations = n.randomizations)
 #   })
-#   
-#   
+# 
+# 
 #   if (verbose) {
 #     cat("calculating difference posterior\n")
 #   }
-#   bdiffp <- calculate.ratio.posterior(jpl[[1]], jpl[[2]], prior, 
+#   bdiffp <- calculate.ratio.posterior(jpl[[1]], jpl[[2]], prior,
 #                                       n.cores = n.cores)
 #   if (verbose) {
 #     cat("summarizing differences\n")
@@ -101,26 +101,26 @@
 #     if (verbose) {
 #       cat("adjusting for batch effects\n")
 #     }
-#     a.bdiffp <- calculate.ratio.posterior(bdiffp, batch.bdiffp, 
-#                                           prior = data.frame(x = as.numeric(colnames(bdiffp)), 
-#                                                              y = rep(1/ncol(bdiffp), ncol(bdiffp))), skip.prior.adjustment = TRUE, 
+#     a.bdiffp <- calculate.ratio.posterior(bdiffp, batch.bdiffp,
+#                                           prior = data.frame(x = as.numeric(colnames(bdiffp)),
+#                                                              y = rep(1/ncol(bdiffp), ncol(bdiffp))), skip.prior.adjustment = TRUE,
 #                                           n.cores = n.cores)
-#     a.bdiffp.rep <- quick.distribution.summary(a.bdiffp, 
+#     a.bdiffp.rep <- quick.distribution.summary(a.bdiffp,
 #                                                expectation = expectation)
 #     if (return.posteriors) {
-#       return(list(batch.adjusted = a.bdiffp.rep, results = bdiffp.rep, 
-#                   batch.effect = batch.bdiffp.rep, difference.posterior = bdiffp, 
-#                   batch.adjusted.difference.posterior = a.bdiffp, 
+#       return(list(batch.adjusted = a.bdiffp.rep, results = bdiffp.rep,
+#                   batch.effect = batch.bdiffp.rep, difference.posterior = bdiffp,
+#                   batch.adjusted.difference.posterior = a.bdiffp,
 #                   joint.posteriors = jpl))
 #     }
 #     else {
-#       return(list(batch.adjusted = a.bdiffp.rep, results = bdiffp.rep, 
+#       return(list(batch.adjusted = a.bdiffp.rep, results = bdiffp.rep,
 #                   batch.effect = batch.bdiffp.rep))
 #     }
 #   }
 #   else {
 #     if (return.posteriors) {
-#       return(list(results = bdiffp.rep, difference.posterior = bdiffp, 
+#       return(list(results = bdiffp.rep, difference.posterior = bdiffp,
 #                   joint.posteriors = jpl))
 #     }
 #     else {
