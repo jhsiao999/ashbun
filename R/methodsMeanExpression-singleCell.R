@@ -235,8 +235,8 @@ methodWrapper.rots <- function(count_matrix, condition,
 #' @param condition Binary vector of length N indicating sample biological condition.
 #' @param control A list with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-#'   \code{filter_by_scde} SCDE internal argument. TRUE if apply SCDE built-in filtering criteria.
-#'   \code{bootstrap_times} SCDE internal argument. Default 100 bootstraps.
+#'   \code{n.randomization} SCDE internal argument: Nubmer of bootstraps.
+#'   \code{n.cores} SCDE internal argument: Nubmer of cores.
 #'
 #' @return A list with the following objects
 #'    \code{sig_order} Z-socres of expression difference, ordered from the most 
@@ -248,8 +248,8 @@ methodWrapper.rots <- function(count_matrix, condition,
 #' @export
 methodWrapper.scde <- function(count_matrix, condition,
                                control = list(save_modelFit = FALSE,
-                                              n.cores = 4,
-                                              bootstrap_times = 100)) {
+                                              n.randomizations = 100,
+                                              n.cores = 4)) {
   
   #--------------------------
   # Make sure input format is correct
@@ -269,7 +269,7 @@ methodWrapper.scde <- function(count_matrix, condition,
                                    threshold.segmentation = TRUE, 
                                    save.crossfit.plots = FALSE, 
                                    save.model.plots = FALSE, 
-                                   min.size.entries = 2000, verbose = 0)
+                                   min.size.entries = 1000, verbose = 0)
   
   # filter out cells that dont't show positive correlation with
   # the expected expression magnitudes 
@@ -277,15 +277,15 @@ methodWrapper.scde <- function(count_matrix, condition,
   
   # estimate gene expression prior
   o.prior <- scde::scde.expression.prior(models = o.ifm, 
-                                         counts = cd, 
+                                         counts = count_matrix, 
                                          length.out = 400, show.plot = FALSE)
   
   # DE analysis
   fit <- scde::scde.expression.difference(o.ifm, count_matrix, o.prior, 
                                           groups  =  condition, 
-                                          n.randomizations  =  control$bootstrap_times, 
+                                          n.randomizations  =  control$n.randomizations, 
                                           # number of bootstrap randomizations to be performed
-                                          n.cores  =  control$n_cores, verbose  =  0)
+                                          n.cores  =  control$n.cores, verbose  =  0)
   
   # order results by magnitude of statistical signifcance
   sig_order <- fit[order(abs(fit$Z), decreasing  =  TRUE), ]
