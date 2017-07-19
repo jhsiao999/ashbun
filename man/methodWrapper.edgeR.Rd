@@ -5,7 +5,7 @@
 \title{edgeR}
 \usage{
 methodWrapper.edgeR(count_matrix, condition, control = list(save_modelFit =
-  FALSE, libsize_factors = rep(1:ncol(count_matrix))))
+  FALSE, norm.factors = rep(1:ncol(count_matrix))))
 }
 \arguments{
 \item{count_matrix}{Gene by sample expression count matrix (G by N).}
@@ -14,7 +14,7 @@ methodWrapper.edgeR(count_matrix, condition, control = list(save_modelFit =
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-\code{libsize_factors} Numeric vector of library size normalization factor.}
+\code{norm.factors} Numeric vector of library size normalization factor.}
 }
 \value{
 A list with the following objects

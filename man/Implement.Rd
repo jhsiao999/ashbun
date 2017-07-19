@@ -9,7 +9,7 @@ methodWrapper.mast(count_matrix, condition, control = list(save_modelFit =
   FALSE, include_cdr = TRUE))
 
 methodWrapper.rots(count_matrix, condition, control = list(save_modelFit =
-  FALSE, bootstrap_times = 100))
+  FALSE, seed = NULL, B = 100))
 }
 \arguments{
 \item{count_matrix}{Gene by sample expression count matrix (G by N).}
@@ -28,7 +28,9 @@ methodWrapper.rots(count_matrix, condition, control = list(save_modelFit =
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-\code{bootstrap_times} SCDE internal argument. Default 100 bootstraps.}
+\code{B} ROTS internal argument: Number of bootstraps. Default 100.
+\code{seed} ROTS internal argument: An integer seed for the random number generator. 
+            Default NULL.}
 }
 \value{
 A list with the following objects
@@ -44,7 +46,7 @@ A list with the following objects
 A list with the following objects
    \code{sig_order} Z-socres of expression difference, ordered from the most 
                     significant to the least significant.
-   \code{fit} SCDE complete output of the model fit.
+   \code{fit} ROTS complete output of the model fit.
 }
 \section{Functions}{
 \itemize{

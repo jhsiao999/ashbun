@@ -5,7 +5,7 @@
 \title{BPSC}
 \usage{
 methodWrapper.bpsc(count_matrix, condition, control = list(save_modelFit =
-  FALSE, bootstrap_times = 100, option_estIntPar = FALSE))
+  FALSE, estIntPar = FALSE, useParallel = TRUE))
 }
 \arguments{
 \item{count_matrix}{Gene by sample expression count matrix (G by N).}
@@ -15,7 +15,9 @@ methodWrapper.bpsc(count_matrix, condition, control = list(save_modelFit =
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{estIntPar} BPSC internal argument (TRUE/FALSE) for using only the expressed
-                 genes to compute parameter estimates.}
+                 genes to compute parameter estimates.
+\code{useParalle} BPSC internal argument (TRUE/FALSE) for using code written for 
+                 parallel computing.}
 }
 \value{
 A list with the following objects
