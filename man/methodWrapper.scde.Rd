@@ -5,7 +5,7 @@
 \title{SCDE}
 \usage{
 methodWrapper.scde(count_matrix, condition, control = list(save_modelFit =
-  FALSE, n.randomizations = 100, n.cores = 4, min.size.entries = 500))
+  FALSE, n.randomizations = 100, n.cores = 4, min.size.entries = 200))
 }
 \arguments{
 \item{count_matrix}{Gene by sample expression count matrix (G by N).}
@@ -29,7 +29,6 @@ A list with the following objects
 Implement SCDE 1.99.1. This older version of SCDE is need for computers
               that are compatible with an older version of flexmix (flexmix_2.3-13; 
               for related discussions on this, see https://github.com/hms-dbmi/scde/issues/40).
-              In addition, SCDE requires a minimum of 2000 genes to perform the analysis.
 }
 \author{
 Chiaowen Joyce Hsiao
