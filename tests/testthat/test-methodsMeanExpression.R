@@ -1,5 +1,5 @@
 
-test_that("Check input format", {
+test_that("methods return pvalues not NAs", {
   ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
   count_matrix <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
   condition <- pData(ipsc_eset)$replicate

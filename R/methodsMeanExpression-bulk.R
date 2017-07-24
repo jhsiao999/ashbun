@@ -4,33 +4,36 @@
 #' 
 #' @description Implement DESeq2.
 #'
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N).
 #' @param condition Binary vector of length N indicating sample biological condition.
+#' @param libsize_factors Numeric vector of scale factors for library sizes. 
+#'                       Default NULL computes libsize_factors using DESeq2.
 #' @param control A list with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{independentFiltering} DESeq2 internal argument. Default = FALSE to not apply gene filtering.
 #'   \code{cooksCutoff} DESeq2 internal argument. Default = FALSE to not exclude samples.
 #'
-#' @return A list with the following objects
-#'   \code{betahat} The estimate effect size of condition for all genes.
-#'   \code{sebetahat} The standard errors of the effect sizes.
+#' @return List with the following objects
+#'   \code{betahat} Estimate effect size of condition for all genes.
+#'   \code{sebetahat} Standard errors of the effect sizes.
 #'   \code{pvalue} P-values of the effect sizes.
 #'   \code{fit} DESeq2 complete output of the model fit. NULL if \code{save_modelFit = FALSE}.
 #'
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.DESeq2 <- function(count_matrix, condition,
+methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
                                  control = list(save_modelFit = FALSE,
                                                 independentFiltering = FALSE,
                                                 cooksCutoff = FALSE)){
   
+  suppressPackageStartupMessages(library(DESeq2))
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(is.matrix(counts))
+  assertthat::assert_that(is.integer(counts), 
+                          msg = "counts is not integer-values")
+  assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # this gives errors... dont' know why
   # assertthat::assert_that(length(unique(condition)) != 2,
@@ -41,7 +44,10 @@ methodWrapper.DESeq2 <- function(count_matrix, condition,
   
   #<--------------------------------------
   # Make "DESeqDataSet" object
-  dds <- DESeq2::DESeqDataSetFromMatrix(count_matrix, S4Vectors::DataFrame(condition), ~ condition)
+  dds <- DESeq2::DESeqDataSetFromMatrix(counts, S4Vectors::DataFrame(condition), ~ condition)
+  
+  # input size factors
+  sizeFactors(dds) <- libsize_factors
   
   # Run DE analysis
   dds <- DESeq(dds, quiet = TRUE)
@@ -76,44 +82,42 @@ methodWrapper.DESeq2 <- function(count_matrix, condition,
 #' 
 #' @description Implement edgeR.
 #'
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N).
 #' @param condition Binary vector of length N indicating sample biological condition.
-#' @param control A list with control arguments, including
+#' @param libsize_factors Numeric vector of scale factors for library sizes. 
+#'                       Default NULL computes libsize_factors using edgeR.
+#' @param control List with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-#'   \code{norm.factors} Numeric vector of library size normalization factor.
 #'
-#' @return A list with the following objects
-#'   \code{betahat} The estimate effect size of condition for all genes.
+#' @return List with the following objects
+#'   \code{betahat} Estimate effect size of condition for all genes.
 #'   \code{pvalue} P-values of the effect sizes.
 #'   \code{fit} edgeR complete output of the model fit. NULL if \code{save_modelFit = FALSE}.
 #'
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.edgeR <- function(count_matrix, condition,
-                                 control = list(save_modelFit = FALSE,
-                                                norm.factors = rep(1:ncol(count_matrix)))){
-  
+methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
+                                 control = list(save_modelFit = FALSE)) {
+
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(dim(counts)[2] == length(condition))
+  
+  counts <- as.matrix(counts)
+  if (!is.factor(condition)) {condition <- factor(condition)}
   
   # This gives erros... don't know why...
   # assertthat::assert_that(length(unique(condition)) != 2,
   #                         msg = "condition vector only allows 2 groups")
   
-  # convert condition to factor
-  if (!is.factor(condition)) {condition <- factor(condition)}
-  
+
   #<--------------------------------------
   # Make "DGEList" object
-  dge <- edgeR::DGEList(counts = count_matrix, 
+  dge <- edgeR::DGEList(counts = counts, 
                         group = condition,
-                        genes = rownames(count_matrix),
-                        norm.factors = control$norm.factors)
+                        genes = rownames(counts),
+                        norm.factors = libsize_factors)
   
   # estimate dispersion
   dge <- edgeR::estimateDisp(dge, design = model.matrix(~condition), robust = TRUE)
@@ -147,30 +151,32 @@ methodWrapper.edgeR <- function(count_matrix, condition,
 #' @description Implement limma with voom and apply the empirical Bayes method 
 #'    in limma. 
 #'
-#' @param count_matrix Gene by sample expression count matrix (G by N).
-#' @param condition Binary vector of length N indicating sample biological condition.
-#' @param control A list with control arguments, including
+#' @param counts normalized gene by sample expression count matrix. (CPM)
+#' @param condition binary vector of length N indicating sample biological condition.
+#' @param libsize_factors Numeric vector of scale factors for library sizes. 
+#'                       Default NULL multiplies all library sizes by 1.
+#' @param pseudocount default .5.                     
+#' @param control List with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete limmaVoom fit results.
 #'
-#' @return A list with the following objects
-#'    \code{betahat} The estimate effect size of condition for all genes.
-#'    \code{sebetahat} The standard errors of the effect sizes.
-#'    \code{df} The degrees of freedom associated with the effect sizes.
+#' @return List with the following objects
+#'    \code{betahat} Estimate effect size of condition for all genes.
+#'    \code{sebetahat} Standard errors of the effect sizes.
+#'    \code{df} Degrees of freedom associated with the effect sizes.
 #'    \code{pvalue} P-values of the effect sizes.
 #'    \code{fit} limmaVoom complete output of the model fit.
-#'
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.limmaVoom <- function(count_matrix, condition,
+methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
                                     control = list(save_modelFit = FALSE)){
   
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(dim(counts)[2] == length(condition))
+  
+  counts <- as.matrix(counts)
+  if (!is.factor(condition)) {condition <- factor(condition)}
   
   # This gives erros... don't know why...
   # assertthat::assert_that(length(unique(condition)) != 2,
@@ -183,10 +189,16 @@ methodWrapper.limmaVoom <- function(count_matrix, condition,
   # create design matrix
   design <- model.matrix(~condition)
   
-  # apply voom: outputs log2CPM values, 
-  # does not apply normalization methods (eg., TMM, quantile)
-  v <- limma::voom(count_matrix, design, plot=FALSE)
-  fit <- limma::lmFit(v)
+  # compute log2CPM
+  if (is.null(pseudocount)) {
+    log2CPM <- log2(counts)
+  } else {
+    log2CPM <- log2(counts + pseudocount)
+  }
+  
+  # don't apply normalization methods (eg., TMM, quantile)
+  weights <- voom.controlPseudocount(counts, design)
+  fit <- limma::lmFit(log2CPM, design, weights = weights)
   fit.ebayes <- limma::eBayes(fit)
   
   # given that the condition is a binary vector
@@ -209,3 +221,61 @@ methodWrapper.limmaVoom <- function(count_matrix, condition,
 
 
 
+
+
+#' @title limma + voom
+#' 
+#' @description Implement limma with voom and apply the empirical Bayes method 
+#'    in limma. This is a modified version of voom which allows to specify pseudocount and 
+#'    pseudo library size. 
+#'    Hence, voom: y <- t(log2(t(counts + pseudocount)/(lib.size + pseudo_libsizes) * 1e+06)).
+#'    
+#'
+#' @param counts gene by sample expression count matrix.
+#' @param design design matrix, generated by R function model.matrix()
+#' @param pseudocount default .5
+#' @param pseudo_libsizes default 1. 
+#'
+#' @return 
+#'    \code{w} Weights of dimension G by N.
+#' @author Chiaowen Joyce Hsiao
+#'
+#' @export
+voom.controlPseudocount <- function(counts, design,
+                                    pseudocount = .5,
+                                    pseudo_libsizes = 1,
+                                    span = .5) {
+  # this function wad adpated from the limma voom function
+  # prior count and library size adjustment are set to be argument
+  lib.size <- colSums(counts)
+  
+  y <- t(log2(t(counts + pseudocount)/(lib.size + pseudo_libsizes) * 1e+06))
+  fit <- lmFit(y, design)
+  if (is.null(fit$Amean))  fit$Amean <- rowMeans(y, na.rm = TRUE)
+  
+  # compute variance-mean dependency
+  sx <- fit$Amean + mean(log2(lib.size + 1)) - log2(1e+06)
+  sy <- sqrt(fit$sigma)
+  allzero <- rowSums(counts) == 0
+  if (any(allzero)) {
+    sx <- sx[!allzero]
+    sy <- sy[!allzero]
+  }
+  l <- lowess(sx, sy, f = span)
+  f <- approxfun(l, rule = 2)
+  if (fit$rank < ncol(design)) {
+    j <- fit$pivot[1:fit$rank]
+    fitted.values <- fit$coef[, j, drop = FALSE] %*% t(fit$design[, 
+                                                                  j, drop = FALSE])
+  }
+  else {
+    fitted.values <- fit$coef %*% t(fit$design)
+  }
+  fitted.cpm <- 2^fitted.values
+  fitted.count <- 1e-06 * t(t(fitted.cpm) * (lib.size + pseudo_libsizes))
+  fitted.logcount <- log2(fitted.count)
+  w <- 1/f(fitted.logcount)^4
+  dim(w) <- dim(fitted.logcount)
+  
+  return(w)
+}

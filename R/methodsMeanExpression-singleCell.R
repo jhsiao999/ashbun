@@ -6,8 +6,12 @@
 #'              requires that the input data is normalized (counts-per-million or
 #'              fragments per-kilo-base per million).
 #' 
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N). BPSC requires this input
+#'               to be normalized expression matrix, such as FPKM or CPM.
 #' @param condition Binary vector of length N indicating sample biological condition.
+#' #' @param libsize_factors Numeric vector of scale factors for library sizes. 
+#'                       Default NULL multiplies all library sizes by 1.
+
 #' @param control A list with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{estIntPar} BPSC internal argument (TRUE/FALSE) for using only the expressed
@@ -15,26 +19,23 @@
 #'   \code{useParalle} BPSC internal argument (TRUE/FALSE) for using code written for 
 #'                    parallel computing.
 #'
-#' @return A list with the following objects
+#' @return List with the following objects
 #'    \code{pvalue} significance value for the group effect.
 #'    \code{fit} BPSC complete output of the model fit.
 
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.bpsc <- function(count_matrix, condition,
+methodWrapper.bpsc <- function(counts, condition, 
                                control = list(save_modelFit = FALSE,
                                               estIntPar = FALSE,
                                               useParallel = TRUE)) {
   
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(dim(counts)[2] == length(condition))
   
-  # convert condition to factor
+  counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
   
   #<--------------------------------------
@@ -49,7 +50,7 @@ methodWrapper.bpsc <- function(count_matrix, condition,
   # Model fitting; estIntPar requires to use only the expressed genes
   # to compute estiamtes, according to the vignette, this option requires longer
   # computational time
-  fit <- BPSC::BPglm(data = count_matrix,
+  fit <- BPSC::BPglm(data = counts,
                      controlIds = controlIds,
                      design = design,
                      coef = 2, 
@@ -75,15 +76,18 @@ methodWrapper.bpsc <- function(count_matrix, condition,
 #' 
 #' @describeIn Implement MAST.
 #' 
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N). MAST requires the default
+#'                input to be log2CPM. In this function, the required input is 
+#'                normalized expression counts, such as CPM. log2CPM is computed internally.
 #' @param condition Binary vector of length N indicating sample biological condition.
+#' @param pseudocount Default .5. 
 #' @param control A list with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{include_cdr} MAST internal argument. TRUE if include cellular detection 
 #'                      rate (fraction of genes detected per sample) as a covariate 
 #'                      (scaled to mean 0 and standard deviation 1).
 #'
-#' @return A list with the following objects
+#' @return List with the following objects
 #'    \code{betahat} The estimate effect size of condition for all genes.
 #'    \code{sebetahat} The standard errors of the effect sizes.
 #'    \code{df} The degrees of freedom associated with the effect sizes.
@@ -96,42 +100,40 @@ methodWrapper.bpsc <- function(count_matrix, condition,
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.mast <- function(count_matrix, condition,
+methodWrapper.mast <- function(counts, condition,
+                               pseudocount = .5,
                                control = list(save_modelFit = FALSE,
                                               include_cdr = TRUE)) {
   
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(dim(counts)[2] == length(condition))
   
-  # convert condition to factor
+  counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
 
   #<--------------------------------------
   
   # compute log2CPM
-  v <- limma::voom(count_matrix, design = model.matrix(~condition), plot=FALSE)
-  log2CPM <- v$E
+  log2CPM <- log2(counts + pseudocount)
   
+  library(MAST)
   # make data.frame into singleCellAssay object 
   colData <- data.frame(condition = condition)
-  rowData <- data.frame(gene = rownames(count_matrix))
-  sca <- MAST::FromMatrix(count_matrix, colData, rowData)
+  rowData <- data.frame(gene = rownames(counts))
+  sca <- suppressMessages(MAST::FromMatrix(log2CPM, colData, rowData))
   
   if (control$include_cdr) {
     # calculate cellualr detection rate; normalized to mean 0 and sd 1
     colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
     # the default method for fitting is bayesGLM
-    fit <- zlm.SingleCellAssay(~ condition + cdr.normed, sca)
+    fit <- suppressMessages(MAST::zlm.SingleCellAssay(~ condition + cdr.normed, sca))
   } else {
-    fit <- zlm.SingleCellAssay(~ condition, sca)
+    fit <-  suppressMessages(MAST::zlm.SingleCellAssay(~ condition, sca))
   }
   
   # LRT test for the significance of the condition effect
-  lrt <- lrTest(fit, "condition")
+  lrt <-  suppressMessages(MAST::lrTest(fit, "condition"))
   
   # extract p.value from their "hurdle" model
   pvalue <- lrt[,3,3]
@@ -167,9 +169,10 @@ methodWrapper.mast <- function(count_matrix, condition,
 #' 
 #' @describeIn Implement ROTS 1.2.0.
 #' 
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N). ROTS requires this input
+#'               to be normalized expression matrix, such as FPKM or CPM.
 #' @param condition Binary vector of length N indicating sample biological condition.
-#' @param control A list with control arguments, including
+#' @param control List with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{B} ROTS internal argument: Number of bootstraps. Default 100.
 #'   \code{seed} ROTS internal argument: An integer seed for the random number generator. 
@@ -183,29 +186,26 @@ methodWrapper.mast <- function(count_matrix, condition,
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.rots <- function(count_matrix, condition,
+methodWrapper.rots <- function(counts, condition,
                                control = list(save_modelFit = FALSE,
                                               seed = NULL,
                                               B = 100)) {
   
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(dim(counts)[2] == length(condition))
   
-  # convert condition to factor
+  counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
   
   #<--------------------------------------
   # fitting model
-  fit <- ROTS::ROTS(data = count_matrix,
-                    groups = condition,
-                    B = control$B,
-                    K = dim(count_matrix)[1],
-                    seed = NULL,
-                    log = FALSE)
+  fit <- suppressMessages( ROTS::ROTS(data = counts,
+                                      groups = condition,
+                                      B = control$B,
+                                      K = dim(counts)[1],
+                                      seed = NULL,
+                                      log = FALSE) )
 
   # extract results
   pvalue <- fit$pvalue
@@ -229,17 +229,19 @@ methodWrapper.rots <- function(count_matrix, condition,
 #' @description Implement SCDE 1.99.1. This older version of SCDE is need for computers
 #'               that are compatible with an older version of flexmix (flexmix_2.3-13; 
 #'               for related discussions on this, see https://github.com/hms-dbmi/scde/issues/40).
+#'               Currently, this function uses the SCDE method for normalizatino and 
+#'               does not allow using other normalization factors.
 #' 
-#' @param count_matrix Gene by sample expression count matrix (G by N).
+#' @param counts Gene by sample expression count matrix (G by N).
 #' @param condition Binary vector of length N indicating sample biological condition.
-#' @param control A list with control arguments, including
+#' @param control List with control arguments, including
 #'   \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 #'   \code{n.randomization} SCDE internal argument: Nubmer of bootstraps.
 #'   \code{n.cores} SCDE internal argument: Nubmer of cores.
 #'   \code{min.size.entries} SCDE internal argument: Mininum number of genes to use when
 #'                            determining expected expression magnitude during model fitting. 
 #'
-#' @return A list with the following objects
+#' @return List with the following objects
 #'    \code{sig_order} Z-socres of expression difference, ordered from the most 
 #'                     significant to the least significant.
 #'    \code{fit} SCDE complete output of the model fit.
@@ -247,27 +249,28 @@ methodWrapper.rots <- function(count_matrix, condition,
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.scde <- function(count_matrix, condition,
+methodWrapper.scde <- function(counts, condition,
                                control = list(save_modelFit = FALSE,
                                               n.randomizations = 100,
                                               n.cores = 4,
-                                              min.size.entries = 200)) {
+                                              min.size.entries = round(ncol(counts)/2))) {
   
   #--------------------------
   # Make sure input format is correct
-  assertthat::assert_that(is.matrix(count_matrix))
-  assertthat::assert_that(is.integer(count_matrix), 
-                          msg = "count_matrix is not integer-values")
-  assertthat::assert_that(dim(count_matrix)[2] == length(condition))
+  assertthat::assert_that(is.matrix(counts))
+  assertthat::assert_that(is.integer(counts), 
+                          msg = "counts is not integer-values")
+  assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # convert condition to factor
   if (!is.factor(condition)) {condition <- factor(condition)}
   
   #<--------------------------------------
   # fitting error models, this step takes a considerable amount of time...
-  o.ifm <- scde::scde.error.models(counts = count_matrix, 
+  o.ifm <- scde::scde.error.models(counts = counts, 
                                    groups = condition, 
                                    n.cores = control$n.cores, 
+                                   min.count.threshold = 1,
                                    threshold.segmentation = TRUE, 
                                    save.crossfit.plots = FALSE, 
                                    save.model.plots = FALSE, 
@@ -280,11 +283,11 @@ methodWrapper.scde <- function(count_matrix, condition,
   
   # estimate gene expression prior
   o.prior <- scde::scde.expression.prior(models = o.ifm, 
-                                         counts = count_matrix, 
+                                         counts = counts, 
                                          length.out = 400, show.plot = FALSE)
   
   # DE analysis
-  fit <- scde::scde.expression.difference(o.ifm, count_matrix, o.prior, 
+  fit <- scde::scde.expression.difference(o.ifm, counts, o.prior, 
                                           groups  =  condition, 
                                           n.randomizations  =  control$n.randomizations, 
                                           # number of bootstrap randomizations to be performed
