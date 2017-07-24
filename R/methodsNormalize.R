@@ -120,7 +120,7 @@ normalize.census <- function(counts,
   
   #<--------------------------------------
   # construct Monocle object
-  library(monocle)
+  suppressPackageStartupMessages(library(monocle))
   # phenoData <- data.frame(sampleID = paste0("sample_", c(1:length(condition))),
   #                         condition = condition)
   phenoData <- data.frame(sampleID = paste0("sample_", c(1:length(condition))))
