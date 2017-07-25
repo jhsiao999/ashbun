@@ -1,20 +1,78 @@
-#' @title Evaluated multiple normalization methods and multiple DE methods
+#' @title Evalute multiple normalization methods and multiple DE methods
+#' 
+#' @example
+#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
+#' condition <- pData(ipsc_eset)$replicate
+#' 
+#' ----- Step 1: filtering
+#' counts_filtered <- filter.excludeAllZeros(counts)
+#' featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
+#'                                                      thresholdDetection = 1,
+#'                                                      fractionExpressed = .01)$index_filter
+#'                                                    
+#' samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
+#'                                                      thresholdDetection = 1,
+#'                                                      fractionExpressed = .01)$index_filter
+#'                                                      
+#' counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+#'
+#' ---- Step 2: 
+#' sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
+#'                                           methodsNormalize = c("TMM", "RLE",
+#'                                                                 "census","scran"))
+#' 
+#' @author Chiaowen Joyce Hsiao
+#' @export
+query.evaluation <- function(counts, condition, is_notnulls,
+                             methodsNormalize, methodsMeanExpression) {
+  
+  results <- query.pipeline(counts, condition, 
+                            methodsNormalize, methodsMeanExpression)
+  
+  
+  results_TPR <- getTPR(response = is_notnull, 
+                        results$pvalues, 
+                        fdr_cutoff = .05)
+  # compute TPR for plotting
+  lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
+    results_sub <- results[results$methodsNormalize == methodsNormalize[index_methodsNormalize]]
+    lapply(1:length(methodsMeanExpression), function(index_methodsMeanExpression) {
+      results_sub_sub <- results_sub[results_sub$]
+    })
+  })
+  
+}
+
+
+
+#' @title Run multiple normalization methods and multiple DE methods
 #' 
 #' @param counts Gene by sample expression count matrix (G by N). 
 #'               Use raw count data before filtering.
 #' @param condition Binary vector of length N indicating sample biological condition.
-#' @param null binary vector of TRUE/FALSE the gene a null gene.
+#' @param null binary indicator of true/false. True = Non-null gene and FALSE = Null gene.
 #' @param methodsNormalize Chararacter vector of evaluted methods. To run all methods, use
 #'                            c("normalize.cpm", "normalize.tmm", "normalize.rle",
 #'                             "normalize.census", "normalize.scnorm", "normalize.scran")
 #' @param methodsMeanExpression Chararacter vector of evaluted methods. To run all methods, use
 #'                             c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")
 #' 
+#' @example
+#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
+#' condition <- pData(ipsc_eset)$replicate
+#' 
+#' results <- query.pipeline(counts = counts,
+#'                           condition = condition,
+#'                           methodsNormalize = c("TMM", "RLE", "census","scran"),
+#'                           methodsMeanExpression = c("DESeq2", "limmaVoom"))
+#' 
 #' @return 
 #'     \code{pvals_longformat} data.frame of pvals.
 #'
 #' @export
-query.pipeline <- function(counts, condition, null,
+query.pipeline <- function(counts, condition, 
                            methodsNormalize, methodsMeanExpression) {
 
   #----- filtering
@@ -52,17 +110,27 @@ query.pipeline <- function(counts, condition, null,
   
   # make list into a long-format data.frame
   pvals_longformat <- do.call(rbind, lapply(1:length(pvals_list), function(index) {
-    pvals_list[[index]] <- data.frame(pvals_list[[index]])
-    pvals_list[[index]]$methodsNormalize <- names(pvals_list)[index]
-    return(pvals_list[[index]])
+    obj <- data.frame(pvals_list[[index]])
+    obj_name <- names(pvals_list)[[index]]
+    
+    obj_transformed <- as.data.frame(do.call(rbind, 
+        lapply(1:dim(pvals_list[[index]])[2], function(index_sub) {
+              foo <- cbind(pvalues = as.numeric(obj[[index_sub]]), 
+                    methodsMeanExpression = colnames(pvals_list[[index]])[[index_sub]])
+              return(foo)
+      })),
+      stringsAsFactors = FALSE)
+    obj_transformed$pvalues <- as.numeric(obj_transformed$pvalues)
+    
+    obj_transformed$methodsNormalize <- obj_name
+    return(obj_transformed)
   }) )
   
   return(pvals_longformat)
-  
 }
   
 
-#' @title Evaluated multiple normalization methods
+#' @title Run multiple normalization methods
 #' 
 #' @param counts Gene by sample expression count matrix (G by N). Use filtered count data.
 #' @param condition Binary vector of length N indicating sample biological condition.
@@ -153,7 +221,7 @@ query.methodsNormalization <- function(counts, condition,
 
 
 
-#' @title Evaluated multiple DE methods
+#' @title Runs multiple DE methods
 #' 
 #' @param counts Gene by sample expression count matrix (G by N). Use filtered count data.
 #' @param counts_normed Normalized expression count matrix 
