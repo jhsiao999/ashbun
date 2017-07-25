@@ -117,7 +117,7 @@ methodWrapper.mast <- function(counts, condition,
   # compute log2CPM
   log2CPM <- log2(counts + pseudocount)
   
-  library(MAST)
+  suppressPackageStartupMessages(library(MAST))
   # make data.frame into singleCellAssay object 
   colData <- data.frame(condition = condition)
   rowData <- data.frame(gene = rownames(counts))
