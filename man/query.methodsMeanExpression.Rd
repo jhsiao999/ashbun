@@ -50,9 +50,11 @@ counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
 ---- Step 3: run DE methods
 pvals_list <- query.methodsMeanExpression(counts = counts_filtered,
                                           counts_normed = counts_normed,
-                                          condition = condition,
+                                          condition = condition_filtered,
                                           libsize_factors = libsize_factors,
-                                          methodsMeanExpression = c("limmaVoom", "edgeR",
+                                          methodsMeanExpression = c("limmaVoom", 
+                                                                    "DESeq2",
+                                                                    "edgeR",
                                                                     "MAST"))
 }
 \author{

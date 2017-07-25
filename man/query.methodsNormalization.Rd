@@ -35,9 +35,11 @@ samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
                                                      fractionExpressed = .01)$index_filter
                                                      
 counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+condition_filtered <- condition[samplesToInclude]
 
 ---- Step 2: compute library size factors
-sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
+sizefactors <- query.methodsNormalization(counts_filtered, 
+                                          condition = condition_filtered,
                                           methodsNormalize = c("TMM", "RLE",
                                                                 "census","scran"))
 

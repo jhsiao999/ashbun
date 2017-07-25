@@ -57,7 +57,10 @@ makeSimCount2groups <- function(counts, Ngene = NULL, Nsamp,
     output$pi0 <- 1
     }
   }
-
+  
+  # make colnames be unique
+  colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
+   
   return(output)
 }
 

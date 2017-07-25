@@ -26,25 +26,15 @@ c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")}
 }
 \examples{
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
-condition <- pData(ipsc_eset)$replicate
+counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 
------ Step 1: filtering
-counts_filtered <- filter.excludeAllZeros(counts)
-featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
-                                                     thresholdDetection = 1,
-                                                     fractionExpressed = .01)$index_filter
-                                                   
-samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
-                                                     thresholdDetection = 1,
-                                                     fractionExpressed = .01)$index_filter
-                                                     
-counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+#---- generat simulated datasets
+simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
 
----- Step 2: 
-sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
-                                          methodsNormalize = c("TMM", "RLE",
-                                                                "census","scran"))
+#---- extract a single dataset as an example
+#---- take pi0 = .9, the first simulated data
+simdata <- simdata_list[[3]][[1]]
+
 
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]

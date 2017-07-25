@@ -2,36 +2,31 @@
 #' 
 #' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
-#' condition <- pData(ipsc_eset)$replicate
+#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 #' 
-#' ----- Step 1: filtering
-#' counts_filtered <- filter.excludeAllZeros(counts)
-#' featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
-#'                                                      thresholdDetection = 1,
-#'                                                      fractionExpressed = .01)$index_filter
-#'                                                    
-#' samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
-#'                                                      thresholdDetection = 1,
-#'                                                      fractionExpressed = .01)$index_filter
-#'                                                      
-#' counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
-#'
-#' ---- Step 2: 
-#' sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
-#'                                           methodsNormalize = c("TMM", "RLE",
-#'                                                                 "census","scran"))
+#' #---- generat simulated datasets
+#' simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
+#' 
+#' #---- extract a single dataset as an example
+#' #---- take pi0 = .9, the first simulated data
+#' simdata <- simdata_list[[3]][[1]]
+#' 
 #' 
 #' @author Chiaowen Joyce Hsiao
+#' 
 # query.evaluation <- function(counts, condition, is_notnulls,
 #                              methodsNormalize, methodsMeanExpression) {
+# 
+#   results <- with(simdata, query.pipeline(counts, condition,
+#                   methodsNormalize = c("TMM", "RLE", "census","scran"),
+#                   methodsMeanExpression = c("DESeq2", "limmaVoom")) )
 #   
-#   results <- query.pipeline(counts, condition, 
-#                             methodsNormalize, methodsMeanExpression)
-#   
-#   
-#   results_TPR <- getTPR(response = is_notnull, 
-#                         results$pvalues, 
+#   results <- query.pipeline(simdata$counts, simdata$condition,
+#                             methodsNormalize = c("TMM", "RLE", "census","scran"),
+#                             methodsMeanExpression = c("DESeq2", "limmaVoom"))
+# 
+#   results_TPR <- getTPR(response = is_notnull,
+#                         results$pvalues,
 #                         fdr_cutoff = .05)
 #   # compute TPR for plotting
 #   lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
@@ -40,7 +35,7 @@
 #       results_sub_sub <- results_sub[results_sub$]
 #     })
 #   })
-#   
+# 
 # }
 
 
@@ -86,10 +81,12 @@ query.pipeline <- function(counts, condition,
   
   counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
   
+  condition_filtered <- condition[samplesToInclude]
+  
   #----- normalization
   methodsNormalize <- c("TMM", "RLE", "census","scran")
   libsize_factors_list <- query.methodsNormalization(counts = counts_filtered, 
-                                            condition = condition,
+                                            condition = condition_filtered,
                                             methodsNormalize = methodsNormalize)
   
   #---- run DE methods
@@ -101,9 +98,9 @@ query.pipeline <- function(counts, condition,
     pvals_list[[index]] <- query.methodsMeanExpression(
                                   counts = counts_filtered,
                                   counts_normed = counts_normed,
-                                  condition = condition,
+                                  condition = condition_filtered,
                                   libsize_factors = libsize_factors,
-                                  methodsMeanExpression = c("limmaVoom", "edgeR", "MAST"))
+                                  methodsMeanExpression = methodsMeanExpression)
   }
   
   
@@ -156,9 +153,11 @@ query.pipeline <- function(counts, condition,
 #'                                                      fractionExpressed = .01)$index_filter
 #'                                                      
 #' counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
-#'
+#' condition_filtered <- condition[samplesToInclude]
+#' 
 #' ---- Step 2: compute library size factors
-#' sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
+#' sizefactors <- query.methodsNormalization(counts_filtered, 
+#'                                           condition = condition_filtered,
 #'                                           methodsNormalize = c("TMM", "RLE",
 #'                                                                 "census","scran"))
 #' 
@@ -260,9 +259,11 @@ query.methodsNormalization <- function(counts, condition,
 #' ---- Step 3: run DE methods
 #' pvals_list <- query.methodsMeanExpression(counts = counts_filtered,
 #'                                           counts_normed = counts_normed,
-#'                                           condition = condition,
+#'                                           condition = condition_filtered,
 #'                                           libsize_factors = libsize_factors,
-#'                                           methodsMeanExpression = c("limmaVoom", "edgeR",
+#'                                           methodsMeanExpression = c("limmaVoom", 
+#'                                                                     "DESeq2",
+#'                                                                     "edgeR",
 #'                                                                     "MAST"))
 #' @author Chiaowen Joyce Hsiao
 #'

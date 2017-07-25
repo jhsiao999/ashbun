@@ -15,3 +15,16 @@ simulationWrapper(counts, Nsim, Nsample, Ngene = NULL)
 
 \item{Ngene}{number of genes. Defaults to include all genes in the input data.}
 }
+\value{
+List of data generated under three different fractions of null genes.
+  \code{null} pi0 = 0. List of Nsim simulated datasets.
+  \code{normal_5} pi0 = 0.5. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
+  \code{norma_9} pi0 = 0.9. List of Nsim simulated datasets. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
+}
+\examples{
+ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
+
+simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 80, Ngene = 500)
+
+}

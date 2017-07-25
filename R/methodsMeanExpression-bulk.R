@@ -43,11 +43,12 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   if (!is.factor(condition)) {condition <- factor(condition)}
   
   #<--------------------------------------
+  suppressPackageStartupMessages(library(DESeq2))
   # Make "DESeqDataSet" object
   dds <- DESeq2::DESeqDataSetFromMatrix(counts, S4Vectors::DataFrame(condition), ~ condition)
   
   # input size factors
-  sizeFactors(dds) <- libsize_factors
+  DESeq2::sizeFactors(dds) <- libsize_factors
   
   # Run DE analysis
   dds <- DESeq(dds, quiet = TRUE)

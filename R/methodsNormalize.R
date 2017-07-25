@@ -123,7 +123,7 @@ normalize.census <- function(counts,
   suppressPackageStartupMessages(library(monocle))
   # phenoData <- data.frame(sampleID = paste0("sample_", c(1:length(condition))),
   #                         condition = condition)
-  phenoData <- data.frame(sampleID = paste0("sample_", c(1:length(condition))))
+  phenoData <- data.frame(sampleID = paste0("sample_", c(1:dim(counts)[2])))
   rownames(phenoData) <- phenoData$sampleID
   colnames(counts) <- phenoData$sampleID
   
