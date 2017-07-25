@@ -1,6 +1,6 @@
 #' @title Evalute multiple normalization methods and multiple DE methods
 #' 
-#' @example
+#' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
 #' condition <- pData(ipsc_eset)$replicate
@@ -57,7 +57,7 @@
 #' @param methodsMeanExpression Chararacter vector of evaluted methods. To run all methods, use
 #'                             c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")
 #' 
-#' @example
+#' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
 #' condition <- pData(ipsc_eset)$replicate
@@ -140,7 +140,7 @@ query.pipeline <- function(counts, condition,
 #' @return 
 #'    \code{libsize_factors} List of multiple size factors.
 
-#' @example
+#' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
 #' condition <- pData(ipsc_eset)$replicate
@@ -236,7 +236,7 @@ query.methodsNormalization <- function(counts, condition,
 #' @return 
 #'    \code{pvalues} data.frame of significance values. Columns corresond to input methods.
 
-#' @example
+#' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
 #' condition <- pData(ipsc_eset)$replicate

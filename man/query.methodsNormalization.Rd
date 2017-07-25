@@ -19,6 +19,29 @@ c("normalize.cpm", "normalize.tmm", "normalize.rle",
 \value{
 \code{libsize_factors} List of multiple size factors.
 }
+\examples{
+ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
+condition <- pData(ipsc_eset)$replicate
+
+----- Step 1: filtering
+counts_filtered <- filter.excludeAllZeros(counts)
+featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
+                                                     thresholdDetection = 1,
+                                                     fractionExpressed = .01)$index_filter
+                                                   
+samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
+                                                     thresholdDetection = 1,
+                                                     fractionExpressed = .01)$index_filter
+                                                     
+counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+
+---- Step 2: compute library size factors
+sizefactors <- query.methodsNormalization(counts_filtered, condition = condition,
+                                          methodsNormalize = c("TMM", "RLE",
+                                                                "census","scran"))
+
+}
 \author{
 Chiaowen Joyce Hsiao
 }

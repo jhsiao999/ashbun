@@ -26,6 +26,35 @@ c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")}
 \value{
 \code{pvalues} data.frame of significance values. Columns corresond to input methods.
 }
+\examples{
+ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
+condition <- pData(ipsc_eset)$replicate
+
+----- Step 1: filtering
+counts_filtered <- filter.excludeAllZeros(counts)
+featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
+                                                     thresholdDetection = 1,
+                                                     fractionExpressed = .01)$index_filter
+                                                   
+samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
+                                                     thresholdDetection = 1,
+                                                     fractionExpressed = .01)$index_filter
+                                                     
+counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+
+---- Step 2: compute library size factors
+libsize_factors <- normalize.scran(counts = counts_filtered)$libsize_factors
+counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
+
+---- Step 3: run DE methods
+pvals_list <- query.methodsMeanExpression(counts = counts_filtered,
+                                          counts_normed = counts_normed,
+                                          condition = condition,
+                                          libsize_factors = libsize_factors,
+                                          methodsMeanExpression = c("limmaVoom", "edgeR",
+                                                                    "MAST"))
+}
 \author{
 Chiaowen Joyce Hsiao
 }

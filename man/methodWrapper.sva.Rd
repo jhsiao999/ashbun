@@ -10,4 +10,6 @@ methodWrapper.sva(count_matrix, design_matrix, num_sv)
 \item{count_matrix}{gene by sample expression matrix. Can be}
 
 \item{design_matrix}{Binary vector of length N indicating sample biological condition.}
+
+\item{num_sv}{number of surrogate variables}
 }

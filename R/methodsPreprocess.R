@@ -75,6 +75,7 @@ filterFeatures.fractionExpressed <- function(counts,
 #'    \code{fraction_expressed} fraction of genes qualified as "expressed".
 #'    \code{index_filter} TRUE/FALSE passing the filter.
 #'
+#' @export
 filterSamples.fractionExpressed <- function(counts, 
                                              thresholdDetection = 1,
                                              fractionExpressed = .25,
