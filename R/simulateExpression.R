@@ -118,7 +118,7 @@ make_normalmix = function(ngene, pi, mu, sd, pi0){
   k = length(pi) # number of components
   comp = sample(1:k,ngene,pi,replace=TRUE) #randomly draw a component
   is_nullgene = (runif(ngene,0,1) < pi0)
-  beta = ifelse(isnull, 0, rnorm(ngene,mu[comp],sd[comp]))
+  beta = ifelse(is_nullgene, 0, rnorm(ngene,mu[comp],sd[comp]))
   return(list(beta=beta, pi0=pi0, is_nullgene = is_nullgene))
 }
 
