@@ -196,6 +196,7 @@ methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
     log2CPM <- log2(counts + pseudocount)
   }
   
+  suppressPackageStartupMessages(library(limma))
   # don't apply normalization methods (eg., TMM, quantile)
   weights <- voom.controlPseudocount(counts, design)
   fit <- limma::lmFit(log2CPM, design, weights = weights)
