@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluateMethods.R
 \name{query.pipeline}
 \alias{query.pipeline}
-\title{Evalute multiple normalization methods and multiple DE methods}
+\title{Run multiple normalization methods and multiple DE methods}
 \usage{
 query.pipeline(counts, condition, is_nullgene = NULL,
   methodsNormalize = c("TMM", "RLE", "census", "scran"),
@@ -31,17 +31,6 @@ c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")}
 }
 \examples{
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
-
-#---- generat simulated datasets
-simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
-
-#---- extract a single dataset as an example
-#---- take pi0 = .9, the first simulated data
-simdata <- simdata_list[[3]][[1]]
-
-
-ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
 condition <- pData(ipsc_eset)$replicate
 
@@ -51,7 +40,4 @@ results <- query.pipeline(counts = counts,
                           methodsNormalize = c("TMM", "RLE", "census","scran"),
                           methodsMeanExpression = c("DESeq2", "limmaVoom"))
 
-}
-\author{
-Chiaowen Joyce Hsiao
 }

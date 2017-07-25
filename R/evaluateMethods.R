@@ -11,30 +11,62 @@
 #' #---- take pi0 = .9, the first simulated data
 #' simdata <- simdata_list[[3]][[1]]
 #' 
-#' 
+#' # ---- gather evaluation results
+#' eval_ouptut <- query.evaluation(counts = simdata$counts,
+#'                                 condition = simdata$condition,
+#'                                 is_nullgene = simdata$is_nullgene,
+#'                                 methodsNormalize = c("TMM", "RLE", "census", "scran"),
+#'                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
+#'                                 report = "fdr_cutoff_summary")
+#'            
 #' @author Chiaowen Joyce Hsiao
 #' 
-# query.evaluation <- function(counts, condition, is_notnulls,
-#                              methodsNormalize, methodsMeanExpression) {
-# 
-#   
-#   results <- with(simdata, query.pipeline(counts, condition, is_nullgene = null,
-#                   methodsNormalize = c("TMM", "RLE", "census", "scran"),
-#                   methodsMeanExpression = c("DESeq2", "limmaVoom")) )
-# 
-#   TPR <- with(results, getTPR(response = data$is_nullgene,
-#                               predictor = pvals_longformat$pvalues,
-#                               fdr_cutoff = .05))
-#   
-#   # compute TPR for plotting
-#   lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
-#     results_sub <- results[results$methodsNormalize == methodsNormalize[index_methodsNormalize]]
-#     lapply(1:length(methodsMeanExpression), function(index_methodsMeanExpression) {
-#       results_sub_sub <- results_sub[results_sub$]
-#     })
-#   })
-# 
-# }
+#' @export
+query.evaluation <- function(counts, condition, is_nullgene,
+                             methodsNormalize = c("TMM", "RLE", "census", "scran"), 
+                             methodsMeanExpression = c("DESeq2", "limmaVoom"),
+                             report = c("fdr_cutoff_summary",
+                                        "roc_plot")) {
+
+  results <- with(simdata, query.pipeline(counts, condition, is_nullgene,
+                  methodsNormalize = methodsNormalize,
+                  methodsMeanExpression = methodsMeanExpression) )
+
+  if (report == "fdr_cutoff_summary") {
+    suppressPackageStartupMessages(library(dplyr))
+    output <- results$pvals_longformat %>% 
+      group_by(methodsNormalize, methodsMeanExpression) %>% 
+      summarise(tpr = getTPR.pROC(results$data$is_nullgene, pvalues, 
+                                  fdr_cutoff = .05))
+    return(output)
+   }
+  
+  if (report == "roc_plot") {
+    list_methodsNormalize <- unique(results$pvals_longformat$methodsNormalize)
+    list_methodsMeanExpression <- unique(results$pvals_longformat$methodsMeanExpression)
+    is_nullgene <- results$data$is_nullgene
+    
+    output <- do.call(rbind, lapply(seq_along(list_methodsNormalize), 
+                                    function(index_normalize) {
+                        
+      one_methodsNormalize <- do.call(rbind, lapply(seq_along(list_methodsMeanExpression), 
+                                                    function(index_meanExpression) {
+            df_sub <- subset(results$pvals_longformat, 
+                           methodsNormalize == list_methodsNormalize[index_normalize] &
+                           methodsMeanExpression == list_methodsMeanExpression[index_meanExpression])
+            pvals_sub <- df_sub$pvalues
+            roc_output <- getROC(is_nullgene, pvals_sub)
+            foo <- data.frame(TPR = roc_output$sensitivities,
+                              FPR = 1- roc_output$specificities,
+                              methodsMeanExpression = list_methodsNormalize[index_meanExpression],
+                              methodsNormlize = list_methodsNormalize[index_normalize])
+            foo <- foo[foo$FPR < .2, ]
+            return(foo)
+      }) )
+    }) )
+    return(output)
+  }
+}
 
 
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/methodsBenchmarks.R
 \name{getROC}
 \alias{getROC}
-\title{compute ROC}
+\title{compute ROC related informatino using pROC package}
 \usage{
 getROC(response, predictor)
 }

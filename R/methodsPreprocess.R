@@ -30,7 +30,7 @@ filter.Wrapper <- function(counts, condition,
 
   return(list(counts = counts_filtered,
               condition = condition_filtered,
-              is_nullgene = is_nullgene))   
+              is_nullgene = is_nullgene_filtered))   
 }
 
 
