@@ -4,15 +4,16 @@
 \alias{methodWrapper.scde}
 \title{SCDE}
 \usage{
-methodWrapper.scde(count_matrix, condition, control = list(save_modelFit =
-  FALSE, n.randomizations = 100, n.cores = 4, min.size.entries = 200))
+methodWrapper.scde(counts, condition, control = list(save_modelFit = FALSE,
+  n.randomizations = 100, n.cores = 4, min.size.entries =
+  round(ncol(counts)/2)))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N).}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
 
-\item{control}{A list with control arguments, including
+\item{control}{List with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{n.randomization} SCDE internal argument: Nubmer of bootstraps.
 \code{n.cores} SCDE internal argument: Nubmer of cores.
@@ -20,7 +21,7 @@ methodWrapper.scde(count_matrix, condition, control = list(save_modelFit =
                          determining expected expression magnitude during model fitting.}
 }
 \value{
-A list with the following objects
+List with the following objects
    \code{sig_order} Z-socres of expression difference, ordered from the most 
                     significant to the least significant.
    \code{fit} SCDE complete output of the model fit.
@@ -29,6 +30,8 @@ A list with the following objects
 Implement SCDE 1.99.1. This older version of SCDE is need for computers
               that are compatible with an older version of flexmix (flexmix_2.3-13; 
               for related discussions on this, see https://github.com/hms-dbmi/scde/issues/40).
+              Currently, this function uses the SCDE method for normalizatino and 
+              does not allow using other normalization factors.
 }
 \author{
 Chiaowen Joyce Hsiao

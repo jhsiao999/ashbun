@@ -5,16 +5,20 @@
 \alias{methodWrapper.rots}
 \title{MAST}
 \usage{
-methodWrapper.mast(count_matrix, condition, control = list(save_modelFit =
-  FALSE, include_cdr = TRUE))
+methodWrapper.mast(counts, condition, pseudocount = 0.5,
+  control = list(save_modelFit = FALSE, include_cdr = TRUE))
 
-methodWrapper.rots(count_matrix, condition, control = list(save_modelFit =
-  FALSE, seed = NULL, B = 100))
+methodWrapper.rots(counts, condition, control = list(save_modelFit = FALSE,
+  seed = NULL, B = 100))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N). MAST requires the default
+input to be log2CPM. In this function, the required input is 
+normalized expression counts, such as CPM. log2CPM is computed internally.}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
+
+\item{pseudocount}{Default .5.}
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
@@ -22,18 +26,19 @@ methodWrapper.rots(count_matrix, condition, control = list(save_modelFit =
                    rate (fraction of genes detected per sample) as a covariate 
                    (scaled to mean 0 and standard deviation 1).}
 
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N). ROTS requires this input
+to be normalized expression matrix, such as FPKM or CPM.}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
 
-\item{control}{A list with control arguments, including
+\item{control}{List with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{B} ROTS internal argument: Number of bootstraps. Default 100.
 \code{seed} ROTS internal argument: An integer seed for the random number generator. 
             Default NULL.}
 }
 \value{
-A list with the following objects
+List with the following objects
    \code{betahat} The estimate effect size of condition for all genes.
    \code{sebetahat} The standard errors of the effect sizes.
    \code{df} The degrees of freedom associated with the effect sizes.

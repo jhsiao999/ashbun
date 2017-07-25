@@ -23,26 +23,25 @@
 #'                                                                 "census","scran"))
 #' 
 #' @author Chiaowen Joyce Hsiao
-#' @export
-query.evaluation <- function(counts, condition, is_notnulls,
-                             methodsNormalize, methodsMeanExpression) {
-  
-  results <- query.pipeline(counts, condition, 
-                            methodsNormalize, methodsMeanExpression)
-  
-  
-  results_TPR <- getTPR(response = is_notnull, 
-                        results$pvalues, 
-                        fdr_cutoff = .05)
-  # compute TPR for plotting
-  lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
-    results_sub <- results[results$methodsNormalize == methodsNormalize[index_methodsNormalize]]
-    lapply(1:length(methodsMeanExpression), function(index_methodsMeanExpression) {
-      results_sub_sub <- results_sub[results_sub$]
-    })
-  })
-  
-}
+# query.evaluation <- function(counts, condition, is_notnulls,
+#                              methodsNormalize, methodsMeanExpression) {
+#   
+#   results <- query.pipeline(counts, condition, 
+#                             methodsNormalize, methodsMeanExpression)
+#   
+#   
+#   results_TPR <- getTPR(response = is_notnull, 
+#                         results$pvalues, 
+#                         fdr_cutoff = .05)
+#   # compute TPR for plotting
+#   lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
+#     results_sub <- results[results$methodsNormalize == methodsNormalize[index_methodsNormalize]]
+#     lapply(1:length(methodsMeanExpression), function(index_methodsMeanExpression) {
+#       results_sub_sub <- results_sub[results_sub$]
+#     })
+#   })
+#   
+# }
 
 
 

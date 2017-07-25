@@ -4,22 +4,27 @@
 \alias{methodWrapper.limmaVoom}
 \title{limma + voom}
 \usage{
-methodWrapper.limmaVoom(count_matrix, condition, control = list(save_modelFit
-  = FALSE))
+methodWrapper.limmaVoom(counts, condition, pseudocount = 0.5,
+  control = list(save_modelFit = FALSE))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{normalized gene by sample expression count matrix. (CPM)}
 
-\item{condition}{Binary vector of length N indicating sample biological condition.}
+\item{condition}{binary vector of length N indicating sample biological condition.}
 
-\item{control}{A list with control arguments, including
+\item{pseudocount}{default .5.}
+
+\item{control}{List with control arguments, including
 \code{save_modelFit} TRUE to output the complete limmaVoom fit results.}
+
+\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+Default NULL multiplies all library sizes by 1.}
 }
 \value{
-A list with the following objects
-   \code{betahat} The estimate effect size of condition for all genes.
-   \code{sebetahat} The standard errors of the effect sizes.
-   \code{df} The degrees of freedom associated with the effect sizes.
+List with the following objects
+   \code{betahat} Estimate effect size of condition for all genes.
+   \code{sebetahat} Standard errors of the effect sizes.
+   \code{df} Degrees of freedom associated with the effect sizes.
    \code{pvalue} P-values of the effect sizes.
    \code{fit} limmaVoom complete output of the model fit.
 }

@@ -4,13 +4,17 @@
 \alias{methodWrapper.DESeq2}
 \title{DESeq2}
 \usage{
-methodWrapper.DESeq2(count_matrix, condition, control = list(save_modelFit =
-  FALSE, independentFiltering = FALSE, cooksCutoff = FALSE))
+methodWrapper.DESeq2(counts, condition, libsize_factors = NULL,
+  control = list(save_modelFit = FALSE, independentFiltering = FALSE,
+  cooksCutoff = FALSE))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N).}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
+
+\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+Default NULL computes libsize_factors using DESeq2.}
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
@@ -18,9 +22,9 @@ methodWrapper.DESeq2(count_matrix, condition, control = list(save_modelFit =
 \code{cooksCutoff} DESeq2 internal argument. Default = FALSE to not exclude samples.}
 }
 \value{
-A list with the following objects
-  \code{betahat} The estimate effect size of condition for all genes.
-  \code{sebetahat} The standard errors of the effect sizes.
+List with the following objects
+  \code{betahat} Estimate effect size of condition for all genes.
+  \code{sebetahat} Standard errors of the effect sizes.
   \code{pvalue} P-values of the effect sizes.
   \code{fit} DESeq2 complete output of the model fit. NULL if \code{save_modelFit = FALSE}.
 }

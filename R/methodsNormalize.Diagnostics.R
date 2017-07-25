@@ -1,4 +1,4 @@
 #SCnorm
 
-checkCountDepth(count_matrix, 
-                     OutputName = "scrnorm_example")
+# checkCountDepth(count_matrix, 
+#                      OutputName = "scrnorm_example")

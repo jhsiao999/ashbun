@@ -4,21 +4,23 @@
 \alias{methodWrapper.edgeR}
 \title{edgeR}
 \usage{
-methodWrapper.edgeR(count_matrix, condition, control = list(save_modelFit =
-  FALSE, norm.factors = rep(1:ncol(count_matrix))))
+methodWrapper.edgeR(counts, condition, libsize_factors = NULL,
+  control = list(save_modelFit = FALSE))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N).}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
 
-\item{control}{A list with control arguments, including
-\code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-\code{norm.factors} Numeric vector of library size normalization factor.}
+\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+Default NULL computes libsize_factors using edgeR.}
+
+\item{control}{List with control arguments, including
+\code{save_modelFit} TRUE to output the complete DESeq2 fit results.}
 }
 \value{
-A list with the following objects
-  \code{betahat} The estimate effect size of condition for all genes.
+List with the following objects
+  \code{betahat} Estimate effect size of condition for all genes.
   \code{pvalue} P-values of the effect sizes.
   \code{fit} edgeR complete output of the model fit. NULL if \code{save_modelFit = FALSE}.
 }

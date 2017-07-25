@@ -4,13 +4,16 @@
 \alias{methodWrapper.bpsc}
 \title{BPSC}
 \usage{
-methodWrapper.bpsc(count_matrix, condition, control = list(save_modelFit =
-  FALSE, estIntPar = FALSE, useParallel = TRUE))
+methodWrapper.bpsc(counts, condition, control = list(save_modelFit = FALSE,
+  estIntPar = FALSE, useParallel = TRUE))
 }
 \arguments{
-\item{count_matrix}{Gene by sample expression count matrix (G by N).}
+\item{counts}{Gene by sample expression count matrix (G by N). BPSC requires this input
+to be normalized expression matrix, such as FPKM or CPM.}
 
-\item{condition}{Binary vector of length N indicating sample biological condition.}
+\item{condition}{Binary vector of length N indicating sample biological condition.
+#' @param libsize_factors Numeric vector of scale factors for library sizes. 
+                      Default NULL multiplies all library sizes by 1.}
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
@@ -20,7 +23,7 @@ methodWrapper.bpsc(count_matrix, condition, control = list(save_modelFit =
                  parallel computing.}
 }
 \value{
-A list with the following objects
+List with the following objects
    \code{pvalue} significance value for the group effect.
    \code{fit} BPSC complete output of the model fit.
 }
