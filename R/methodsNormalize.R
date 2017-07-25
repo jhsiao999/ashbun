@@ -255,7 +255,21 @@ normalize.scnorm <- function(counts, condition,
 #'                        
 #' @return 
 #'    \code{libsize_factors} numeric vector of the scale factors for library size.
-#'
+#'    
+#' @examples
+#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
+#' 
+#' #---- generat simulated datasets
+#' simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
+#' 
+#' #---- extract a single dataset as an example
+#' #---- take pi0 = .9, the first simulated data
+#' simdata <- simdata_list[[3]][[1]]
+#' 
+#' #---- normalize
+#' output <- normalize.scran(simdata$counts)
+#' 
 #' @export
 normalize.scran <- function(counts, 
                              control = list(save_modelFit = FALSE,
@@ -282,12 +296,11 @@ normalize.scran <- function(counts,
   
   # cluster cells
   if (control$get_cell_clusters) {
-    cell_clusters <- scran::quickCluster(sce,
-                                         min.size = control$min.size)
+    cell_clusters <- scran::quickCluster(sce, min.size = control$min.size)
 
     # scran requires the number of cells in each cluster should at leaset be
     # twice that of the larges pool size
-    control$sizes <- seq(10, round(max(table(cell_clusters))/2 ), by = 20)
+    control$sizes <- seq(10, round(min(table(cell_clusters))/2 ), by = 20)
   } else {
     control$cell_clusters <- NULL
   }

@@ -17,17 +17,15 @@
 # query.evaluation <- function(counts, condition, is_notnulls,
 #                              methodsNormalize, methodsMeanExpression) {
 # 
-#   results <- with(simdata, query.pipeline(counts, condition,
-#                   methodsNormalize = c("TMM", "RLE", "census","scran"),
-#                   methodsMeanExpression = c("DESeq2", "limmaVoom")) )
 #   
-#   results <- query.pipeline(simdata$counts, simdata$condition,
-#                             methodsNormalize = c("TMM", "RLE", "census","scran"),
-#                             methodsMeanExpression = c("DESeq2", "limmaVoom"))
+#   results <- with(simdata, query.pipeline(counts, condition, is_nullgene = null,
+#                   methodsNormalize = c("TMM", "RLE", "census", "scran"),
+#                   methodsMeanExpression = c("DESeq2", "limmaVoom")) )
 # 
-#   results_TPR <- getTPR(response = is_notnull,
-#                         results$pvalues,
-#                         fdr_cutoff = .05)
+#   TPR <- with(results, getTPR(response = data$is_nullgene,
+#                               predictor = pvals_longformat$pvalues,
+#                               fdr_cutoff = .05))
+#   
 #   # compute TPR for plotting
 #   lapply(1:length(methodsNormalize), function(index_methodsNormalize) {
 #     results_sub <- results[results$methodsNormalize == methodsNormalize[index_methodsNormalize]]
@@ -59,40 +57,40 @@
 #' 
 #' results <- query.pipeline(counts = counts,
 #'                           condition = condition,
+#'                           is_nullgene = NULL,
 #'                           methodsNormalize = c("TMM", "RLE", "census","scran"),
 #'                           methodsMeanExpression = c("DESeq2", "limmaVoom"))
 #' 
 #' @return 
+#'     \code{data} List of filtered data, including count matrix, sample condition vector,
+#'                  and logical vector for null gene status (TRUE if null).
 #'     \code{pvals_longformat} data.frame of pvals.
 #'
 #' @export
-query.pipeline <- function(counts, condition, 
-                           methodsNormalize, methodsMeanExpression) {
+query.pipeline <- function(counts, condition, is_nullgene = NULL, 
+                           methodsNormalize = c("TMM", "RLE", "census","scran"), 
+                           methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR",
+                                                     "BPSC", "MAST", "ROTS")) {
 
   #----- filtering
-  counts_filtered <- filter.excludeAllZeros(counts)
-  featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
-                                                       thresholdDetection = 1,
-                                                       fractionExpressed = .01)$index_filter
-  
-  samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
-                                                       thresholdDetection = 1,
-                                                       fractionExpressed = .01)$index_filter
-  
-  counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
-  
-  condition_filtered <- condition[samplesToInclude]
+  data_filtered <- filter.Wrapper(counts = counts,
+                                  condition = condition,
+                                  is_nullgene = is_nullgene)
   
   #----- normalization
-  methodsNormalize <- c("TMM", "RLE", "census","scran")
-  libsize_factors_list <- query.methodsNormalization(counts = counts_filtered, 
-                                            condition = condition_filtered,
-                                            methodsNormalize = methodsNormalize)
+  libsize_factors_list <- with(data_filtered,
+                               query.methodsNormalization(counts = counts, 
+                                                          condition = counts,
+                                                          methodsNormalize = methodsNormalize))
   
   #---- run DE methods
+  counts_filtered <- data_filtered$counts
+  condition_filtered <- data_filtered$condition
   pvals_list <- vector("list", length = length(methodsNormalize))
   names(pvals_list) <- methodsNormalize
+  
   for (index in 1:length(methodsNormalize)) {
+    
     counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
     libsize_factors <- libsize_factors_list[[index]]
     pvals_list[[index]] <- query.methodsMeanExpression(
@@ -122,7 +120,8 @@ query.pipeline <- function(counts, condition,
     return(obj_transformed)
   }) )
   
-  return(pvals_longformat)
+  return(list(data = data_filtered,
+              pvals_longformat = pvals_longformat))
 }
   
 

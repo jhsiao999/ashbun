@@ -4,7 +4,10 @@
 \alias{query.pipeline}
 \title{Evalute multiple normalization methods and multiple DE methods}
 \usage{
-query.pipeline(counts, condition, methodsNormalize, methodsMeanExpression)
+query.pipeline(counts, condition, is_nullgene = NULL,
+  methodsNormalize = c("TMM", "RLE", "census", "scran"),
+  methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR", "BPSC", "MAST",
+  "ROTS"))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). 
@@ -22,7 +25,9 @@ c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")}
 \item{null}{binary indicator of true/false. True = Non-null gene and FALSE = Null gene.}
 }
 \value{
-\code{pvals_longformat} data.frame of pvals.
+\code{data} List of filtered data, including count matrix, sample condition vector,
+                 and logical vector for null gene status (TRUE if null).
+    \code{pvals_longformat} data.frame of pvals.
 }
 \examples{
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
@@ -42,6 +47,7 @@ condition <- pData(ipsc_eset)$replicate
 
 results <- query.pipeline(counts = counts,
                           condition = condition,
+                          is_nullgene = NULL,
                           methodsNormalize = c("TMM", "RLE", "census","scran"),
                           methodsMeanExpression = c("DESeq2", "limmaVoom"))
 

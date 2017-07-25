@@ -89,14 +89,14 @@ non_null_sim <- function(counts, args){
   be <- make_normalmix(ngene,
                      args$betaargs$betapi, args$betaargs$betamu, args$betaargs$betasd,
                      args$pi0)
-  null <- be$null # null gene indicators
+  is_nullgene <- be$is_nullgene # null gene indicators
   beta <- be$beta
   # Use Poisson thinning to add effects to null data
   sim_list = pois_thinning(counts, beta)
   return(list(counts=sim_list$counts,
               condition = sim_list$condition,
               beta = beta,
-              null=null))
+              is_nullgene=is_nullgene))
 }
 
 #' @title Generate beta (effects) from normal mixture prior
@@ -117,9 +117,9 @@ make_normalmix = function(ngene, pi, mu, sd, pi0){
   }
   k = length(pi) # number of components
   comp = sample(1:k,ngene,pi,replace=TRUE) #randomly draw a component
-  isnull = (runif(ngene,0,1) < pi0)
+  is_nullgene = (runif(ngene,0,1) < pi0)
   beta = ifelse(isnull, 0, rnorm(ngene,mu[comp],sd[comp]))
-  return(list(beta=beta, pi0=pi0, null=isnull))
+  return(list(beta=beta, pi0=pi0, is_nullgene = is_nullgene))
 }
 
 #' @title Poisson thinning
@@ -132,20 +132,20 @@ make_normalmix = function(ngene, pi, mu, sd, pi0){
 #' @export
 pois_thinning = function(counts, log2foldchanges){
   nsamp = dim(counts)[2]/2
-  null = (log2foldchanges==0)
-  log2foldchanges = log2foldchanges[!null]
+  is_nullgene = (log2foldchanges==0)
+  log2foldchanges = log2foldchanges[!is_nullgene]
   foldchanges = 2^log2foldchanges
 
   # thin group A
-  counts[which(!null)[log2foldchanges>0],1:nsamp] =
+  counts[which(!is_nullgene)[log2foldchanges>0],1:nsamp] =
     matrix(rbinom(sum(log2foldchanges>0)*nsamp,
-                  size=c(as.matrix(counts[which(!null)[log2foldchanges>0],1:nsamp])),
-                  prob=rep(1/foldchanges[log2foldchanges>0],nsamp)),ncol=nsamp)
+            size=c(as.matrix(counts[which(!is_nullgene)[log2foldchanges>0],1:nsamp])),
+            prob=rep(1/foldchanges[log2foldchanges>0],nsamp)),ncol=nsamp)
   # thin group B
-  counts[which(!null)[log2foldchanges<0],(nsamp+1):(2*nsamp)] =
+  counts[which(!is_nullgene)[log2foldchanges<0],(nsamp+1):(2*nsamp)] =
     matrix(rbinom(sum(log2foldchanges<0)*nsamp,
-                  size=c(as.matrix(counts[which(!null)[log2foldchanges<0],(nsamp+1):(2*nsamp)])),
-                  prob=rep(foldchanges[log2foldchanges<0],nsamp)),ncol=nsamp)
+            size=c(as.matrix(counts[which(!is_nullgene)[log2foldchanges<0],(nsamp+1):(2*nsamp)])),
+            prob=rep(foldchanges[log2foldchanges<0],nsamp)),ncol=nsamp)
 
   condition <- c(rep(1, nsamp), rep(2, nsamp))
 

@@ -27,3 +27,18 @@ The most recent version of scran depends on R > 3.4.
              vector of yes/no, and in the newer version, the spike-in variable is a numeric
              vector specifying which genes is spike-in controls.
 }
+\examples{
+ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
+
+#---- generat simulated datasets
+simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
+
+#---- extract a single dataset as an example
+#---- take pi0 = .9, the first simulated data
+simdata <- simdata_list[[3]][[1]]
+
+#---- normalize
+output <- normalize.scran(simdata$counts)
+
+}

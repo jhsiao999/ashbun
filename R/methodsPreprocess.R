@@ -3,6 +3,37 @@
 
 #----- filtering criteria
 
+#' @title Wrapper for all filtering steps
+#'
+#' @param counts Gene by sample expression count matrix (G by N).
+#'                        
+#' @return 
+#'    \code{counts} filtered count matrix.
+#'
+#' @export
+filter.Wrapper <- function(counts, condition, 
+                           is_nullgene = NULL) {
+  
+  counts_filtered <- filter.excludeAllZeros(counts)
+  featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
+                                                        thresholdDetection = 1,
+                                                        fractionExpressed = .01)$index_filter
+  
+  samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
+                                                       thresholdDetection = 1,
+                                                       fractionExpressed = .01)$index_filter
+  
+  counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
+  condition_filtered <- condition[samplesToInclude]
+  
+  if (!is.null(is_nullgene)) { is_nullgene_filtered <- is_nullgene[featuresToInclude]}
+
+  return(list(counts = counts_filtered,
+              condition = condition_filtered,
+              is_nullgene = is_nullgene))   
+}
+
+
 #' @title Filter all-zero samples and features.
 #'
 #' @param counts Gene by sample expression count matrix (G by N).
