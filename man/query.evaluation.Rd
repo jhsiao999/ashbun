@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluateMethods.R
 \name{query.evaluation}
 \alias{query.evaluation}
-\title{Evalute multiple normalization methods and multiple DE methods}
+\title{Evaluate multiple normalization methods and multiple DE methods}
 \usage{
 query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
   "RLE", "census", "scran"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
@@ -25,8 +25,9 @@ eval_ouptut <- query.evaluation(counts = simdata$counts,
                                 is_nullgene = simdata$is_nullgene,
                                 methodsNormalize = c("TMM", "RLE", "census", "scran"),
                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                                report = "fdr_cutoff_summary")
-           
+                                report = "fdr_cutoff_summary",
+                                report.control = list(fdr_cutoff = .05) )
+
 }
 \author{
 Chiaowen Joyce Hsiao

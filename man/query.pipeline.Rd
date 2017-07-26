@@ -10,7 +10,7 @@ query.pipeline(counts, condition, is_nullgene = NULL,
   "ROTS"))
 }
 \arguments{
-\item{counts}{Gene by sample expression count matrix (G by N). 
+\item{counts}{Gene by sample expression count matrix (G by N).
 Use raw count data before filtering.}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}

@@ -26,19 +26,19 @@ condition <- pData(ipsc_eset)$replicate
 
 ----- Step 1: filtering
 counts_filtered <- filter.excludeAllZeros(counts)
-featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
+featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
                                                      thresholdDetection = 1,
                                                      fractionExpressed = .01)$index_filter
-                                                   
-samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
+
+samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
                                                      thresholdDetection = 1,
                                                      fractionExpressed = .01)$index_filter
-                                                     
+
 counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
 condition_filtered <- condition[samplesToInclude]
 
 ---- Step 2: compute library size factors
-sizefactors <- query.methodsNormalization(counts_filtered, 
+sizefactors <- query.methodsNormalization(counts_filtered,
                                           condition = condition_filtered,
                                           methodsNormalize = c("TMM", "RLE",
                                                                 "census","scran"))

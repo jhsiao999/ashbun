@@ -21,7 +21,7 @@ library(singleCellRNASeqHumanTungiPSC)
 eset <- HumanTungiPSC
 counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
 
-sim_counts <- makeSimCount2groups(counts, 
+sim_counts <- makeSimCount2groups(counts,
                                   Ngenes = 100,
                                   Nsam = 20,
                                   sample_method = "all_genes")

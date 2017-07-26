@@ -33,7 +33,7 @@ library(singleCellRNASeqHumanTungiPSC)
 eset <- HumanTungiPSC
 counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
 
-sim_data_null <- simulationWrapper(counts, 
+sim_data_null <- simulationWrapper(counts,
                               Ngenes = 100,
                               Nsam = 20,
                               sample_method = "all_genes",
@@ -46,5 +46,5 @@ sim_data_nonnull <- simulationWrapper(counts, Nsim = 2,
                               pi0 = .5,
                               beta_args = args.big_normal(betapi = 1,
                                                           betamu = 0, betasd = .8))
-                              
+
 }

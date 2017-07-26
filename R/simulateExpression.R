@@ -2,12 +2,12 @@
 #  Simulate single cell expression count data the Stephens way..
 #
 #  Date:2017-07-26
-#  Adapted from Mengyin Lu's work: Variable and function names 
+#  Adapted from Mengyin Lu's work: Variable and function names
 #  may be different from the original code.
 #
 #  The main top-level functions are
-#  makeSimCount2groups(...): generate null gene expression set 
-#     from experimental data, 
+#  makeSimCount2groups(...): generate null gene expression set
+#     from experimental data,
 #  non_null_sim(...): sample a random set of null expression data
 #     to be signal gene and determine signal based on a normal
 #     distribution
@@ -19,24 +19,24 @@
 #' @param Nsim number of simulated datasets
 #' @param Nsample number of samples per biological condition
 #' @param Ngenes number of genes. Defaults to include all genes in the input data.
-#' 
-#' @examples 
+#'
+#' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
-#' 
+#'
 #' simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 80, Ngenes = 500)
-#' 
+#'
 #' @return List of data generated under three different fractions of null genes.
 #'   \code{null} pi0 = 0. List of Nsim simulated datasets.
 #'   \code{normal_5} pi0 = 0.5. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
 #'   \code{norma_9} pi0 = 0.9. List of Nsim simulated datasets. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
-#' 
-#' @examples 
+#'
+#' @examples
 #' library(singleCellRNASeqHumanTungiPSC)
 #' eset <- HumanTungiPSC
 #' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
-#' 
-#' sim_data_null <- simulationWrapper(counts, 
+#'
+#' sim_data_null <- simulationWrapper(counts,
 #'                               Ngenes = 100,
 #'                               Nsam = 20,
 #'                               sample_method = "all_genes",
@@ -49,14 +49,14 @@
 #'                               pi0 = .5,
 #'                               beta_args = args.big_normal(betapi = 1,
 #'                                                           betamu = 0, betasd = .8))
-#'                               
+#'
 #' @export
 simulationWrapper <- function(counts,
                               Nsim = 1, Nsample, Ngenes = NULL,
                               pi0 = NULL,
                               sample_method = c("all_genes", "per_gene"),
-                              beta_args = args.big_normal(betapi = c(1), 
-                                                          betamu = c(0), 
+                              beta_args = args.big_normal(betapi = c(1),
+                                                          betamu = c(0),
                                                           betasd = c(1))) {
   simdata <- lapply(1:Nsim, function(i) {
     #  set.seed(999*i)
@@ -66,14 +66,14 @@ simulationWrapper <- function(counts,
                                  sample_method = sample_method)
       return(foo)
     }
-    
+
     if (pi0 < 1) {
       foo <- makeSimCount2groups(counts = counts,
                                  Nsamp = Nsample, Ngenes = Ngenes,
                                  sample_method = sample_method)
-      foo2 <- non_null_sim(counts = foo$counts, 
+      foo2 <- non_null_sim(counts = foo$counts,
                            condition = foo$condition,
-                           pi0, 
+                           pi0,
                            beta_args = beta_args)
       return(foo2)
     }
@@ -87,17 +87,17 @@ simulationWrapper <- function(counts,
 #' @param Ngenes Number of genes in the simulated dataset.
 #' @param Nsamp Number of total samples in the simulated data.
 #' @param pi0 Proportion of null genes. Default to be 1.
-#' 
+#'
 #' @examples
 #' library(singleCellRNASeqHumanTungiPSC)
 #' eset <- HumanTungiPSC
 #' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
-#' 
-#' sim_counts <- makeSimCount2groups(counts, 
+#'
+#' sim_counts <- makeSimCount2groups(counts,
 #'                                   Ngenes = 100,
 #'                                   Nsam = 20,
 #'                                   sample_method = "all_genes")
-#' 
+#'
 #' @export
 makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
                                 sample_method = c("per_gene", "all_genes")){
@@ -136,14 +136,14 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
   condition <- rep(1:2, each = Nsamp/2)
   condition <- condition[sample(1:(Nsamp), size = Nsamp)]
   output$condition <- condition
-  
+
   # reorder sample columns
   output$condition <- output$condition[order(output$condition)]
   output$counts <- output$counts[, order(output$condition)]
-  
+
   # make colnames be unique
   colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
-   
+
   return(output)
 }
 
@@ -174,8 +174,8 @@ sampleingene <- function(count_onegene, Nsamp){
 #' library(singleCellRNASeqHumanTungiPSC)
 #' eset <- HumanTungiPSC
 #' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
-#' 
-#' counts_null <- makeSimCount2groups(counts, 
+#'
+#' counts_null <- makeSimCount2groups(counts,
 #'                                    Ngenes = 100,
 #'                                    Nsam = 20,
 #'                                    sample_method = "all_genes")
@@ -183,7 +183,7 @@ sampleingene <- function(count_onegene, Nsamp){
 #'                            counts_null$condition,
 #'                            pi0 = .5,
 #'                            beta_args = args.big_normal())
-#'                                  
+#'
 #' @export
 non_null_sim <- function(counts, condition, pi0,
                          beta_args = list(betapi, betamu, betasd) ){
@@ -212,8 +212,8 @@ non_null_sim <- function(counts, condition, pi0,
 #'
 #' @return null Binary vector of length Ngenes. 1 = null, 0 = no null.
 #' @return scalar value pi0 proportion of null
-#' 
-#' @examples 
+#'
+#' @examples
 #' betas <- make_normalmix(100, pi = .5,
 #'                         beta_args = args.big_normal())
 #' @export
@@ -246,23 +246,23 @@ pois_thinning <- function(counts, condition, log2foldchanges){
   # thin group A
   num_positive_foldchange <- sum(log2foldchanges > 0)
   which_positive_foldchange <- which(log2foldchanges > 0)
-  
+
   counts[which(!is_nullgene)[which_positive_foldchange], which(condition == 1)] <-
     matrix(rbinom(num_positive_foldchange*nsamples_per_group,
             size = c(as.matrix(counts[which(!is_nullgene)[which_positive_foldchange],
                                       which(condition == 1)]) ),
-            prob = rep(1/foldchanges[which_positive_foldchange], nsamples_per_group)), 
+            prob = rep(1/foldchanges[which_positive_foldchange], nsamples_per_group)),
             ncol = nsamples_per_group)
-  
+
   # thin group B
   num_negative_foldchange <- sum(log2foldchanges < 0)
   which_negative_foldchange <- which(log2foldchanges < 0)
-  
+
   counts[which(!is_nullgene)[which_negative_foldchange], which(condition == 2)] <-
     matrix(rbinom(num_negative_foldchange*nsamples_per_group,
-            size = c(as.matrix(counts[which(!is_nullgene)[which_negative_foldchange], 
+            size = c(as.matrix(counts[which(!is_nullgene)[which_negative_foldchange],
                                       which(condition == 2)])),
-            prob = rep(foldchanges[which_negative_foldchange], nsamples_per_group)), 
+            prob = rep(foldchanges[which_negative_foldchange], nsamples_per_group)),
             ncol = nsamples_per_group)
 
   return(list(counts = counts, condition = condition))
@@ -311,6 +311,6 @@ args.big_normal <- function(betapi = c(1), betamu = c(0), betasd = c(1)) {
 #' @export
 args.bimodal <- function(...) {
   list(betapi = c(0.5,0.5),
-       betamu = c(-2,2), 
+       betamu = c(-2,2),
        betasd=c(1,1)/sqrt(2*Nsamp-2))
 }

@@ -11,7 +11,7 @@ query.methodsMeanExpression(counts, counts_normed, condition, libsize_factors,
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). Use filtered count data.}
 
-\item{counts_normed}{Normalized expression count matrix 
+\item{counts_normed}{Normalized expression count matrix
 (typicall CPM with normlized library size).}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
@@ -33,14 +33,14 @@ condition <- pData(ipsc_eset)$replicate
 
 ----- Step 1: filtering
 counts_filtered <- filter.excludeAllZeros(counts)
-featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered, 
+featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
                                                      thresholdDetection = 1,
                                                      fractionExpressed = .01)$index_filter
-                                                   
-samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered, 
+
+samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
                                                      thresholdDetection = 1,
                                                      fractionExpressed = .01)$index_filter
-                                                     
+
 counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
 
 ---- Step 2: compute library size factors
@@ -52,7 +52,7 @@ pvals_list <- query.methodsMeanExpression(counts = counts_filtered,
                                           counts_normed = counts_normed,
                                           condition = condition_filtered,
                                           libsize_factors = libsize_factors,
-                                          methodsMeanExpression = c("limmaVoom", 
+                                          methodsMeanExpression = c("limmaVoom",
                                                                     "DESeq2",
                                                                     "edgeR",
                                                                     "MAST"))
