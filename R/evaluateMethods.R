@@ -17,8 +17,7 @@
 #'                                 is_nullgene = simdata$is_nullgene,
 #'                                 methodsNormalize = c("TMM", "RLE", "census", "scran"),
 #'                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-#'                                 report = "fdr_cutoff_summary",
-#'                                 report.control = list(fdr_cutoff = .05) )
+#'                                 report = "fdr_cutoff_summary") )
 #'
 #' @author Chiaowen Joyce Hsiao
 #'
@@ -27,7 +26,8 @@ query.evaluation <- function(counts, condition, is_nullgene,
                              methodsNormalize = c("TMM", "RLE", "census", "scran"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
                              report = c("fdr_cutoff_summary",
-                                        "roc_plot")) {
+                                        "roc_plot"),
+                             report.control = list(fdr_cutoff = .05)) {
 
   results <- with(simdata, query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,

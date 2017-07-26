@@ -6,7 +6,8 @@
 \usage{
 query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
   "RLE", "census", "scran"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
-  report = c("fdr_cutoff_summary", "roc_plot"))
+  report = c("fdr_cutoff_summary", "roc_plot"),
+  report.control = list(fdr_cutoff = 0.05))
 }
 \examples{
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
@@ -25,8 +26,7 @@ eval_ouptut <- query.evaluation(counts = simdata$counts,
                                 is_nullgene = simdata$is_nullgene,
                                 methodsNormalize = c("TMM", "RLE", "census", "scran"),
                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                                report = "fdr_cutoff_summary",
-                                report.control = list(fdr_cutoff = .05) )
+                                report = "fdr_cutoff_summary") )
 
 }
 \author{
