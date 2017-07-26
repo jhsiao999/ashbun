@@ -4,7 +4,7 @@
 \alias{pois_thinning}
 \title{Poisson thinning}
 \usage{
-pois_thinning(counts, log2foldchanges)
+pois_thinning(counts, condition, log2foldchanges)
 }
 \arguments{
 \item{counts}{G genes by N samples null count matrix.}
