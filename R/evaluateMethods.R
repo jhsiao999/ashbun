@@ -5,6 +5,7 @@
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 #'
 #' #---- generat simulated datasets
+#' library(ashbun)
 #' simdata_list <- simulationWrapper(counts, Nsim = 2,
 #'                                  Ngenes = 100,
 #'                                  Nsam = 20,
@@ -29,7 +30,7 @@
 #'
 #' @export
 query.evaluation <- function(counts, condition, is_nullgene,
-                             methodsNormalize = c("TMM", "RLE", "census", "scran"),
+                             methodsNormalize = c("TMM", "RLE", "census"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
                              report = c("fdr_cutoff_summary",
                                         "roc_plot"),
@@ -44,23 +45,11 @@ query.evaluation <- function(counts, condition, is_nullgene,
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
 
   if (report == "fdr_cutoff_summary") {
-    # ughhh.. dplyr fail
-    # suppressPackageStartupMessages(library(dplyr))
-    # output <- df_summarize %>%
-    #   group_by(methodsNormalize, methodsMeanExpression) %>%
-    #   summarise(tpr = ashbun::getTPR.pROC(response = is_nullgene,
-    #                                       predictor = pvalues))
-    output <- do.call(rbind, lapply(1:length(unique(methodsMeanExpression)),
-                                    function(index_meanExpression) {
-         do.call(rbind, lapply(1:length(unique(methodsNormalize)),
-                               function(index_normalize) {
-                data.frame(methodsNormalize = methodsNormalize[index_normalize],
-                           methodsMeanExpression = methodsMeanExpression[index_meanExpression],
-                           TPR = ashbun::getTPR.pROC(response = df_summarize$is_nullgene,
-                                                     predictor = df_summarize$pvalues))
-      }) )
-    }) )
-
+    suppressPackageStartupMessages(library(dplyr))
+    output <- df_summarize %>%
+      group_by(methodsNormalize, methodsMeanExpression) %>%
+      summarise(tpr = getTPR.pROC(response = is_nullgene,
+                                          predictor = pvalues))
     return(output)
    }
 

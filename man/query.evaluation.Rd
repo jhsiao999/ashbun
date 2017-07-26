@@ -5,7 +5,7 @@
 \title{Evaluate multiple normalization methods and multiple DE methods}
 \usage{
 query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
-  "RLE", "census", "scran"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
+  "RLE", "census"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
   report = c("fdr_cutoff_summary", "roc_plot"),
   report.control = list(fdr_cutoff = 0.05))
 }
@@ -14,6 +14,7 @@ ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "as
 counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 
 #---- generat simulated datasets
+library(ashbun)
 simdata_list <- simulationWrapper(counts, Nsim = 2,
                                  Ngenes = 100,
                                  Nsam = 20,

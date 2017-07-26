@@ -12,15 +12,11 @@
 getTPR <- function(true_positive_rate, false_positive_rate,
                    fdr_cutoff = .05) {
 
-  if (length(unique(response)) == 1) {
-    tpr <- NA
-  } else {
-    df <- data.frame(true_positive_rate = true_positive_rate,
-                     false_positive_rate = false_positive_rate)
-    df <- df[order(df$false_positive_rate, df$true_positive_rate), ]
-    which_max_fdr <- max(which(df$false_positive_rate < .05))
-    tpr <- with(df, true_positive_rate[which_max_fdr])
-  }
+  df <- data.frame(true_positive_rate = true_positive_rate,
+                   false_positive_rate = false_positive_rate)
+  df <- df[order(df$false_positive_rate, df$true_positive_rate), ]
+  which_max_fdr <- max(which(df$false_positive_rate < .05))
+  tpr <- with(df, true_positive_rate[which_max_fdr])
   return(tpr)
 }
 
@@ -41,12 +37,15 @@ getTPR.pROC <- function(response, predictor,
   if (length(unique(response)) == 1) {
     tpr <- NA
   } else {
-    pROC_output <- ashbun::getROC(response, predictor)
-    tpr <- with(pROC_output, ashbun::getTPR(sensitivities,
-                                    1- specificities, fdr_cutoff = .05))
+  pROC_output <- getROC(response, predictor)
+  tpr <- with(pROC_output, getTPR(sensitivities,
+                                  1- specificities, fdr_cutoff = .05))
   }
   return(tpr)
 }
+
+
+
 
 #' Compute AUC
 #'
@@ -55,6 +54,7 @@ getTPR.pROC <- function(response, predictor,
 #'
 #' @export
 getAUC <- function(response, predictor) {
+  library(pROC)
   if (length(unique(response)) == 1) {
     auc <- NA
   } else {
@@ -67,6 +67,8 @@ getAUC <- function(response, predictor) {
 #'
 #' @export
 getROC <- function(response, predictor) {
+  library(pROC)
+
   if (length(unique(response)) == 1) {
     auc <- NA
   } else {
