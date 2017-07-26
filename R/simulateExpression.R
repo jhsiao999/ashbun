@@ -1,26 +1,110 @@
-###########################################################
-#  Code for simulating single cell expression count data
+###############################################################
+#  Simulate single cell expression count data the Stephens way..
 #
-#  Date:2017-04-03
-#  Code adapted from Mengyin Lu's work
-###########################################################
+#  Date:2017-07-26
+#  Adapted from Mengyin Lu's work: Variable and function names 
+#  may be different from the original code.
+#
+#  The main top-level functions are
+#  makeSimCount2groups(...): generate null gene expression set 
+#     from experimental data, 
+#  non_null_sim(...): sample a random set of null expression data
+#     to be signal gene and determine signal based on a normal
+#     distribution
+###############################################################
+
+#' @title Wrapper for simulating M datasets
+#'
+#' @param counts gene by sample count matrix
+#' @param Nsim number of simulated datasets
+#' @param Nsample number of samples per biological condition
+#' @param Ngenes number of genes. Defaults to include all genes in the input data.
+#' 
+#' @examples 
+#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
+#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
+#' 
+#' simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 80, Ngenes = 500)
+#' 
+#' @return List of data generated under three different fractions of null genes.
+#'   \code{null} pi0 = 0. List of Nsim simulated datasets.
+#'   \code{normal_5} pi0 = 0.5. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
+#'   \code{norma_9} pi0 = 0.9. List of Nsim simulated datasets. List of Nsim simulated datasets. For each simulated dataset, I store the count table and a logical vector indicating TRUE = null gene, and FALSE = true DE gene.
+#' 
+#' @examples 
+#' library(singleCellRNASeqHumanTungiPSC)
+#' eset <- HumanTungiPSC
+#' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
+#' 
+#' sim_data_null <- simulationWrapper(counts, 
+#'                               Ngenes = 100,
+#'                               Nsam = 20,
+#'                               sample_method = "all_genes",
+#'                               pi0 = 1)
+#' 
+#' sim_data_nonnull <- simulationWrapper(counts, Nsim = 2,
+#'                               Ngenes = 100,
+#'                               Nsam = 20,
+#'                               sample_method = "all_genes",
+#'                               pi0 = .5,
+#'                               beta_args = args.big_normal(betapi = 1,
+#'                                                           betamu = 0, betasd = .8))
+#'                               
+#' @export
+simulationWrapper <- function(counts,
+                              Nsim = 1, Nsample, Ngenes = NULL,
+                              pi0 = NULL,
+                              sample_method = c("all_genes", "per_gene"),
+                              beta_args = args.big_normal(betapi = c(1), 
+                                                          betamu = c(0), 
+                                                          betasd = c(1))) {
+  simdata <- lapply(1:Nsim, function(i) {
+    #  set.seed(999*i)
+    if (pi0 == 1) {
+      foo <- makeSimCount2groups(counts = counts,
+                                 Nsamp = Nsample, Ngenes = Ngenes,
+                                 sample_method = sample_method)
+      return(foo)
+    }
+    
+    if (pi0 < 1) {
+      foo <- makeSimCount2groups(counts = counts,
+                                 Nsamp = Nsample, Ngenes = Ngenes,
+                                 sample_method = sample_method)
+      foo2 <- non_null_sim(counts = foo$counts, 
+                           condition = foo$condition,
+                           pi0, 
+                           beta_args = beta_args)
+      return(foo2)
+    }
+  })
+}
 
 
 #' @title Generate count matrix of all null genes
 #'
-#' @param counts Gene expression count matrix from a dataset (usually consisting of one biological condition).
-#' @param Ngene Number of genes in the simulated dataset.
-#' @param Nsamp Number of samples per condition in the simulated data.
-#' @param nullpi Proportion of null genes.
-#'
+#' @param counts Gene expression count matrix from a dataset.
+#' @param Ngenes Number of genes in the simulated dataset.
+#' @param Nsamp Number of total samples in the simulated data.
+#' @param pi0 Proportion of null genes. Default to be 1.
+#' 
+#' @examples
+#' library(singleCellRNASeqHumanTungiPSC)
+#' eset <- HumanTungiPSC
+#' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
+#' 
+#' sim_counts <- makeSimCount2groups(counts, 
+#'                                   Ngenes = 100,
+#'                                   Nsam = 20,
+#'                                   sample_method = "all_genes")
+#' 
 #' @export
-makeSimCount2groups <- function(counts, Ngene = NULL, Nsamp,
-                              sample_method = c("per_gene", "all_genes"),
-                              control = list(pi0 = NULL)){
-   output <- list(counts = counts)
+makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
+                                sample_method = c("per_gene", "all_genes")){
+  output <- list(counts = counts)
 
-  if (!is.null(Ngene)) {
-    genes_to_include <- sample(1:NROW(counts), Ngene, replace = FALSE)
+  if (!is.null(Ngenes)) {
+    genes_to_include <- sample(1:NROW(counts), Ngenes, replace = FALSE)
     counts_subset <- counts[genes_to_include, ]
   } else {
     counts_subset <- counts
@@ -28,41 +112,42 @@ makeSimCount2groups <- function(counts, Ngene = NULL, Nsamp,
 
   if (sample_method == "per_gene") {
     # For each gene, randomly select 2*Nsamp samples from counts
-    counts_subset <- t(apply(counts_subset, 1, sampleingene, Nsamp=2*Nsamp))
+    counts_subset <- t(apply(counts_subset, 1, sampleingene, Nsamp=Nsamp))
     # Remove genes without any reads
     if ( sum(apply(counts_subset,1,sum) == 0) > 0) {
       counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
     } else {
       counts_subset <- counts_subset
     }
-    #Ngene <- NROW(counts_subset)
+    #Ngenes <- NROW(counts_subset)
     output$counts <- counts_subset
   }
 
   if (sample_method == "all_genes") {
-    samples_to_include <- sample((1:NCOL(counts)), 2*Nsamp, replace = TRUE)
+    samples_to_include <- sample((1:NCOL(counts)), Nsamp, replace = TRUE)
     counts_subset <- counts_subset[, samples_to_include]
     # Remove genes without any reads
     counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
-    #Ngene <- NROW(counts_subset)
+    #Ngenes <- NROW(counts_subset)
     output$counts <- counts_subset
   }
 
-  if (!is.null(control$pi0)) {
-    if (control$pi0 == 1) {
-    # assign samples to 2 arbitrary conditions
-    condition <- rep(1:2, each = Nsamp)
-    condition <- condition[sample(1:(Nsamp*2), size = Nsamp*2)]
-    output$condition <- condition
-    output$pi0 <- 1
-    }
-  }
+  # assign samples to 2 arbitrary conditions
+  condition <- rep(1:2, each = Nsamp/2)
+  condition <- condition[sample(1:(Nsamp), size = Nsamp)]
+  output$condition <- condition
+  
+  # reorder sample columns
+  output$condition <- output$condition[order(output$condition)]
+  output$counts <- output$counts[, order(output$condition)]
   
   # make colnames be unique
   colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
    
   return(output)
 }
+
+
 
 #' @title Randomisation of sample at each gene
 #'
@@ -79,47 +164,69 @@ sampleingene <- function(count_onegene, Nsamp){
 #'
 #' @param counts G*N null count matrix, rows are genes and columns are samples
 #' @param args List of arguments, including
-#'  - betaargs: parameters for the normal mixture distribution to generate signals
-#'  - pi0: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)
+#'   \code{beta_args}: parameters for normal mixture distributions.
+#'        \code{betapi} Probability vector for the k components in the normal mixture.
+#'        \code{betamu} Mean vector for k mixture components.
+#'        \code{betasd} Standard deviation vector for k mixture components.
+#'   \code{pi0}: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)
 #'
+#' @examples
+#' library(singleCellRNASeqHumanTungiPSC)
+#' eset <- HumanTungiPSC
+#' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
+#' 
+#' counts_null <- makeSimCount2groups(counts, 
+#'                                    Ngenes = 100,
+#'                                    Nsam = 20,
+#'                                    sample_method = "all_genes")
+#' counts_sim <- non_null_sim(counts_null$counts,
+#'                            counts_null$condition,
+#'                            pi0 = .5,
+#'                            beta_args = args.big_normal())
+#'                                  
 #' @export
-non_null_sim <- function(counts, args){
+non_null_sim <- function(counts, condition, pi0,
+                         beta_args = list(betapi, betamu, betasd) ){
   # Thinned effect sizes generated from normal mixture prior
-  ngene <- dim(counts)[1]
-  be <- make_normalmix(ngene,
-                     args$betaargs$betapi, args$betaargs$betamu, args$betaargs$betasd,
-                     args$pi0)
+  Ngenes <- dim(counts)[1]
+  be <- make_normalmix(Ngenes,
+                       beta_args = beta_args,
+                       pi0)
   is_nullgene <- be$is_nullgene # null gene indicators
   beta <- be$beta
   # Use Poisson thinning to add effects to null data
-  sim_list = pois_thinning(counts, beta)
-  return(list(counts=sim_list$counts,
+  sim_list <- pois_thinning(counts, condition, beta)
+  return(list(counts = sim_list$counts,
               condition = sim_list$condition,
               beta = beta,
-              is_nullgene=is_nullgene))
+              is_nullgene = is_nullgene))
 }
 
 #' @title Generate beta (effects) from normal mixture prior
 #'
-#' @param ngene Total number of genes (null + non-null in the data).
+#' @param Ngenes Total number of genes (null + non-null in the data).
 #' @param pi K-component probability vector. K = number of components in the mixture prior.
 #' @param mu Length-K mean vector of the mixture components.
 #' @param sd Length-K standard error vector of the mixture components.
 #' @param pi0 Proportion of null genes.Default = "random", which selects a random number between 0 and 1 from a uniform distribution.
 #'
-#' @return null Binary vector of length ngene. 1 = null, 0 = no null.
+#' @return null Binary vector of length Ngenes. 1 = null, 0 = no null.
 #' @return scalar value pi0 proportion of null
-#'
+#' 
+#' @examples 
+#' betas <- make_normalmix(100, pi = .5,
+#'                         beta_args = args.big_normal())
 #' @export
-make_normalmix = function(ngene, pi, mu, sd, pi0){
+make_normalmix <- function(Ngenes, pi0,
+                          beta_args = list(betapi, betamu, betasd)){
   if (pi0=="random"){
     pi0 = runif(1,0,1) #generate the proportion of true nulls randomly
   }
-  k = length(pi) # number of components
-  comp = sample(1:k,ngene,pi,replace=TRUE) #randomly draw a component
-  is_nullgene = (runif(ngene,0,1) < pi0)
-  beta = ifelse(is_nullgene, 0, rnorm(ngene,mu[comp],sd[comp]))
-  return(list(beta=beta, pi0=pi0, is_nullgene = is_nullgene))
+  k <- length(beta_args$betapi) # number of components
+  comp <- sample(1:k, Ngenes, beta_args$betapi,replace=TRUE) #randomly draw a component
+  is_nullgene <- (runif(Ngenes,0,1) < pi0)
+  beta <- ifelse(is_nullgene, 0, rnorm(Ngenes, beta_args$betamu[comp], beta_args$betasd[comp]))
+  return(list(beta = beta, pi0 = pi0, is_nullgene = is_nullgene))
 }
 
 #' @title Poisson thinning
@@ -130,68 +237,80 @@ make_normalmix = function(ngene, pi, mu, sd, pi0){
 #' @return counts A simulated count matrix of non-null and null genes.
 #'
 #' @export
-pois_thinning = function(counts, log2foldchanges){
-  nsamp = dim(counts)[2]/2
-  is_nullgene = (log2foldchanges==0)
-  log2foldchanges = log2foldchanges[!is_nullgene]
-  foldchanges = 2^log2foldchanges
+pois_thinning <- function(counts, condition, log2foldchanges){
+  nsamples_per_group <- length(condition)/2
+  is_nullgene <- log2foldchanges == 0
+  log2foldchanges <- log2foldchanges[!is_nullgene]
+  foldchanges <- 2^log2foldchanges
 
   # thin group A
-  counts[which(!is_nullgene)[log2foldchanges>0],1:nsamp] =
-    matrix(rbinom(sum(log2foldchanges>0)*nsamp,
-            size=c(as.matrix(counts[which(!is_nullgene)[log2foldchanges>0],1:nsamp])),
-            prob=rep(1/foldchanges[log2foldchanges>0],nsamp)),ncol=nsamp)
+  num_positive_foldchange <- sum(log2foldchanges > 0)
+  which_positive_foldchange <- which(log2foldchanges > 0)
+  
+  counts[which(!is_nullgene)[which_positive_foldchange], which(condition == 1)] <-
+    matrix(rbinom(num_positive_foldchange*nsamples_per_group,
+            size = c(as.matrix(counts[which(!is_nullgene)[which_positive_foldchange],
+                                      which(condition == 1)]) ),
+            prob = rep(1/foldchanges[which_positive_foldchange], nsamples_per_group)), 
+            ncol = nsamples_per_group)
+  
   # thin group B
-  counts[which(!is_nullgene)[log2foldchanges<0],(nsamp+1):(2*nsamp)] =
-    matrix(rbinom(sum(log2foldchanges<0)*nsamp,
-            size=c(as.matrix(counts[which(!is_nullgene)[log2foldchanges<0],(nsamp+1):(2*nsamp)])),
-            prob=rep(foldchanges[log2foldchanges<0],nsamp)),ncol=nsamp)
+  num_negative_foldchange <- sum(log2foldchanges < 0)
+  which_negative_foldchange <- which(log2foldchanges < 0)
+  
+  counts[which(!is_nullgene)[which_negative_foldchange], which(condition == 2)] <-
+    matrix(rbinom(num_negative_foldchange*nsamples_per_group,
+            size = c(as.matrix(counts[which(!is_nullgene)[which_negative_foldchange], 
+                                      which(condition == 2)])),
+            prob = rep(foldchanges[which_negative_foldchange], nsamples_per_group)), 
+            ncol = nsamples_per_group)
 
-  condition <- c(rep(1, nsamp), rep(2, nsamp))
-
-  return(list(counts=counts, condition = condition))
+  return(list(counts = counts, condition = condition))
 }
 
 
 #' @title spiky prior
 #'
 #' @export
-args.spiky <- function(nsamp, pi0 = "random") {
-  list(pi0=pi0,
-       betaargs=list(betapi=c(.4,.2,.2,.2),betamu=c(0,0,0,0),betasd=c(.25,.5,1,2)/sqrt(2*nsamp-2)))
+args.spiky <- function(...) {
+  list(betapi=c(.4,.2,.2,.2),betamu=c(0,0,0,0),betasd=c(.25,.5,1,2)/sqrt(2*Nsamp-2))
 }
 
 #' @title near normal prior
 #' @export
-args.near_normal <- function(nsamp, pi0 = "random") {
-  list(pi0=pi0,
-       betaargs=list(betapi=c(2/3,1/3),betamu=c(0,0),betasd=c(1,2)/sqrt(2*nsamp-2)))
+args.near_normal <- function(...) {
+  list(betapi=c(2/3,1/3),betamu=c(0,0),betasd=c(1,2)/sqrt(2*Nsamp-2))
 }
 
 #' @title flat top prior
 #'
 #' @export
-args.flat_top <- function(nsamp, pi0 = "random") {
-  list(pi0=pi0,
-       betaargs=list(betapi=rep(1/7,7),betamu=c(-1.5,-1,-0.5,0,0.5,1,1.5),betasd=rep(0.5,7)/sqrt(2*nsamp-2)))
+args.flat_top <- function(...) {
+  list(betapi=rep(1/7,7),
+       betamu=c(-1.5,-1,-0.5,0,0.5,1,1.5),
+       betasd=rep(0.5,7)/sqrt(2*Nsamp-2))
 }
 
-#' @title big normal prior
+#' @title Normal mixture prior. Default 1 component.
 #'
-#' @param nsamp Number of samples per group
+#' @param Nsamp Number of samples per group
+#' @param betapi Probabliy vector of k components in the normal mixture.
+#' @param betamu Mean vector of k components in the normal mixture.
 #' @param betasd Standard deviation of the effect sizes.
 #' @param pi0 Fraction of null genes. Default = Random.
 #'
 #' @export
-args.big_normal <- function(nsamp, betasd = 1, pi0 = "random") {
-  list(pi0=pi0,
-       betaargs=list(betapi=c(1),betamu=c(0),betasd=betasd ))
+args.big_normal <- function(betapi = c(1), betamu = c(0), betasd = c(1)) {
+  list(betapi = betapi,
+       betamu = betamu,
+       betasd = betasd )
 }
 
 #' @title bimodal prior
 #'
 #' @export
-args.bimodal <- function(nsamp, pi0 = "random") {
-  list(pi0=pi0,
-       betaargs=list(betapi=c(0.5,0.5),betamu=c(-2,2),betasd=c(1,1)/sqrt(2*nsamp-2)))
+args.bimodal <- function(...) {
+  list(betapi = c(0.5,0.5),
+       betamu = c(-2,2), 
+       betasd=c(1,1)/sqrt(2*Nsamp-2))
 }
