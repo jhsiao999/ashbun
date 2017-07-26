@@ -47,7 +47,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
     suppressPackageStartupMessages(library(dplyr))
     output <- df_summarize %>%
       group_by(methodsNormalize, methodsMeanExpression) %>%
-      summarise(tpr = getTPR.pROC(is_nullgene, pvalues,
+      summarise(tpr = getTPR.pROC(response = is_nullgene, predictor = pvalues,
                                   fdr_cutoff = report.control$fdr_cutoff))
     return(output)
    }
@@ -66,7 +66,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
                            methodsNormalize == list_methodsNormalize[index_normalize] &
                            methodsMeanExpression == list_methodsMeanExpression[index_meanExpression])
             pvals_sub <- df_sub$pvalues
-            roc_output <- getROC(is_nullgene, pvals_sub)
+            roc_output <- getROC(response = is_nullgene, predictor = pvals_sub)
             foo <- data.frame(TPR = roc_output$sensitivities,
                               FPR = 1- roc_output$specificities,
                               methodsMeanExpression = list_methodsNormalize[index_meanExpression],
