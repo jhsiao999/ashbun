@@ -29,9 +29,9 @@ query.evaluation <- function(counts, condition, is_nullgene,
                                         "roc_plot"),
                              report.control = list(fdr_cutoff = .05)) {
 
-  results <- with(simdata, query.pipeline(counts, condition, is_nullgene,
+  results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
-                  methodsMeanExpression = methodsMeanExpression) )
+                  methodsMeanExpression = methodsMeanExpression) 
 
   if (report == "fdr_cutoff_summary") {
     suppressPackageStartupMessages(library(dplyr))
