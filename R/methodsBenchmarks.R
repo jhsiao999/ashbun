@@ -5,17 +5,17 @@
 #' @param true_positive_rate numeric vector of sensitivity.
 #' @param false_positive_rate numeric vector of 1 - specificity.
 #' @param fdr_cutoff default .05
-#' 
-#' @return 
+#'
+#' @return
 #'    \code{tpr} true postive rate at the given FDR threshold.
 #' @export
-getTPR <- function(true_positive_rate, false_positive_rate, 
+getTPR <- function(true_positive_rate, false_positive_rate,
                    fdr_cutoff = .05) {
-  
+
   if (length(unique(response)) == 1) {
     tpr <- NA
   } else {
-    df <- data.frame(true_positive_rate = true_positive_rate, 
+    df <- data.frame(true_positive_rate = true_positive_rate,
                      false_positive_rate = false_positive_rate)
     df <- df[order(df$false_positive_rate, df$true_positive_rate), ]
     which_max_fdr <- max(which(df$false_positive_rate < .05))
@@ -30,18 +30,19 @@ getTPR <- function(true_positive_rate, false_positive_rate,
 #'
 #' @param pROC_output output from pROC package
 #' @param fdr_cutoff default .05
-#' 
-#' @return 
+#'
+#' @return
 #'    \code{tpr} true postive rate at the given FDR threshold.
+#'
 #' @export
-getTPR.pROC <- function(response, predictor, 
+getTPR.pROC <- function(response, predictor,
                    fdr_cutoff = .05) {
-  
+
   if (length(unique(response)) == 1) {
     tpr <- NA
   } else {
-    pROC_output <- getROC(response, predictor)
-    tpr <- with(pROC_output, getTPR(sensitivities,
+    pROC_output <- ashbun::getROC(response, predictor)
+    tpr <- with(pROC_output, ashbun::getTPR(sensitivities,
                                     1- specificities, fdr_cutoff = .05))
   }
   return(tpr)
@@ -86,19 +87,19 @@ getROC <- function(response, predictor) {
 #   } else {
 #     ordered_list <- data.frame(response, predictor)
 #     ordered_list <- ordered_list[order(ordered_list$predictor), ]
-# 
+#
 #     # cumulative number of null genes
 #     cc <- cumsum(ordered_list$response == 0)
-# 
+#
 #     # fraction of false discoveries at each cutoff
 #     ff <- cc/sum(ordered_list$response == 0)
-# 
+#
 #     # find the cutoff at which fdr is no more than threshold
 #     cutoff_index <- sum(ff < fdr_cutoff)
-# 
+#
 #     # find the significance value corresponding to the fdr cutoff
 #     cutoff_sigvalue <- ordered_list$predictor[cutoff_index]
-# 
+#
 #     # compute true positive rate
 #     tpr <- sum(response == 1 & predictor < cutoff_sigvalue)/sum(response == 1)
 #   }

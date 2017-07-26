@@ -23,7 +23,7 @@
 #'                                 is_nullgene = simdata$is_nullgene,
 #'                                 methodsNormalize = c("TMM", "RLE"),
 #'                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-#'                                 report = "fdr_cutoff_summary") 
+#'                                 report = "fdr_cutoff_summary")
 #'
 #' @author Chiaowen Joyce Hsiao
 #'
@@ -37,18 +37,30 @@ query.evaluation <- function(counts, condition, is_nullgene,
 
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
-                  methodsMeanExpression = methodsMeanExpression) 
-  
+                  methodsMeanExpression = methodsMeanExpression)
+
   num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
   df_summarize <- results$pvals_longformat
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
-  
+
   if (report == "fdr_cutoff_summary") {
-    suppressPackageStartupMessages(library(dplyr))
-    output <- df_summarize %>%
-      group_by(methodsNormalize, methodsMeanExpression) %>%
-      summarise(tpr = getTPR.pROC(response = is_nullgene, predictor = pvalues,
-                                  fdr_cutoff = report.control$fdr_cutoff))
+    # ughhh.. dplyr fail
+    # suppressPackageStartupMessages(library(dplyr))
+    # output <- df_summarize %>%
+    #   group_by(methodsNormalize, methodsMeanExpression) %>%
+    #   summarise(tpr = ashbun::getTPR.pROC(response = is_nullgene,
+    #                                       predictor = pvalues))
+    output <- do.call(rbind, lapply(1:length(unique(methodsMeanExpression)),
+                                    function(index_meanExpression) {
+         do.call(rbind, lapply(1:length(unique(methodsNormalize)),
+                               function(index_normalize) {
+                data.frame(methodsNormalize = methodsNormalize[index_normalize],
+                           methodsMeanExpression = methodsMeanExpression[index_meanExpression],
+                           TPR = ashbun::getTPR.pROC(response = df_summarize$is_nullgene,
+                                                     predictor = df_summarize$pvalues))
+      }) )
+    }) )
+
     return(output)
    }
 

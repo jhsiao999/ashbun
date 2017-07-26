@@ -32,7 +32,7 @@ eval_ouptut <- query.evaluation(counts = simdata$counts,
                                 is_nullgene = simdata$is_nullgene,
                                 methodsNormalize = c("TMM", "RLE"),
                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                                report = "fdr_cutoff_summary") 
+                                report = "fdr_cutoff_summary")
 
 }
 \author{
