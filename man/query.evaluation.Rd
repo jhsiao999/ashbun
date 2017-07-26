@@ -14,19 +14,25 @@ ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "as
 counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 
 #---- generat simulated datasets
-simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
+simdata_list <- simulationWrapper(counts, Nsim = 2,
+                                 Ngenes = 100,
+                                 Nsam = 20,
+                                 sample_method = "all_genes",
+                                 pi0 = .5,
+                                 beta_args = args.big_normal(betapi = 1,
+                                                             betamu = 0, betasd = .8))
 
 #---- extract a single dataset as an example
 #---- take pi0 = .9, the first simulated data
-simdata <- simdata_list[[3]][[1]]
+simdata <- simdata_list[[1]]
 
 # ---- gather evaluation results
 eval_ouptut <- query.evaluation(counts = simdata$counts,
                                 condition = simdata$condition,
                                 is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("TMM", "RLE", "census", "scran"),
+                                methodsNormalize = c("TMM", "RLE"),
                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                                report = "fdr_cutoff_summary") )
+                                report = "fdr_cutoff_summary") 
 
 }
 \author{

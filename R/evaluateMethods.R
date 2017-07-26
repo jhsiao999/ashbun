@@ -5,19 +5,25 @@
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
 #'
 #' #---- generat simulated datasets
-#' simdata_list <- simulationWrapper(counts, Nsim = 5, Nsample = 100, Ngene = 500)
+#' simdata_list <- simulationWrapper(counts, Nsim = 2,
+#'                                  Ngenes = 100,
+#'                                  Nsam = 20,
+#'                                  sample_method = "all_genes",
+#'                                  pi0 = .5,
+#'                                  beta_args = args.big_normal(betapi = 1,
+#'                                                              betamu = 0, betasd = .8))
 #'
 #' #---- extract a single dataset as an example
 #' #---- take pi0 = .9, the first simulated data
-#' simdata <- simdata_list[[3]][[1]]
+#' simdata <- simdata_list[[1]]
 #'
 #' # ---- gather evaluation results
 #' eval_ouptut <- query.evaluation(counts = simdata$counts,
 #'                                 condition = simdata$condition,
 #'                                 is_nullgene = simdata$is_nullgene,
-#'                                 methodsNormalize = c("TMM", "RLE", "census", "scran"),
+#'                                 methodsNormalize = c("TMM", "RLE"),
 #'                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-#'                                 report = "fdr_cutoff_summary") )
+#'                                 report = "fdr_cutoff_summary") 
 #'
 #' @author Chiaowen Joyce Hsiao
 #'
@@ -32,12 +38,16 @@ query.evaluation <- function(counts, condition, is_nullgene,
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
                   methodsMeanExpression = methodsMeanExpression) 
-
+  
+  num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
+  df_summarize <- results$pvals_longformat
+  df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
+  
   if (report == "fdr_cutoff_summary") {
     suppressPackageStartupMessages(library(dplyr))
-    output <- results$pvals_longformat %>%
+    output <- df_summarize %>%
       group_by(methodsNormalize, methodsMeanExpression) %>%
-      summarise(tpr = getTPR.pROC(results$data$is_nullgene, pvalues,
+      summarise(tpr = getTPR.pROC(is_nullgene, pvalues,
                                   fdr_cutoff = report.control$fdr_cutoff))
     return(output)
    }
