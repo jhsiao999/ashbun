@@ -33,38 +33,54 @@ simulate:
 # Can be made more concise / flexible
 #
 
-cpm:
+rle:
   exec: normalize.R
-  .alias: cpm
+  .alias: rle
   params:
     counts: $counts
     condition: NULL
+    method: rle
+  return:
+    model = R(output$model_output),
+    libsize = R(output$libsize_factors)
+
+tmm(rle):
+  .alias: tmm
+  params:
+    method: tmm
+
+cpm(rle):
+  .alias: cpm
+  params:
     method: cpm
+  return:
+    counts = R(output$cpm),
+    model = R(output$model_output),
+    libsize = R(output$libsize_factors)
+
+census(rle):
+  .alias: census
+  params:
+    method: census
   return:
     counts = R(output$counts_normed),
     model = R(output$model_output),
     libsize = R(output$libsize_factors)
 
-tmm(cpm):
-  .alias: tmm
-  params:
-    method: tmm
-
-rle(cpm):
-  .alias: rle
-  params:
-    method: rle
-
-census(cpm):
-  .alias: census
-  params:
-    method: census
-
-scnorm(cpm):
+scnorm(rle):
   .alias: scnorm
   params:
     method: scnorm
     condition: $condition
+  return:
+    counts = R(output$counts_normed),
+    model = R(output$model_output),
+    libsize = R(output$libsize_factors)
+
+scran(rle):
+  .alias: scran
+  params:
+    method: scran
 
 #
 # Mean expression
@@ -74,11 +90,11 @@ rots:
   .alias: rots
   params:
     counts: $counts
-    condition:  $condition
+    condition: $condition
     libsize: NULL
     method: rots
   return:
-    pvalue = R(output$pvalue)
+    pvalue = R(output$pvalue),
     fit = R(output$fit)
 
 bpsc(rots):
@@ -117,5 +133,5 @@ DSC:
   run:
     all: get_counts * simulate * (cpm, tmm, rle, census, scnorm) * (DESeq2, edgeR, limmaVoom, bpsc, mast, rots, scde)
   R_libs: jhsiao999/singleCellRNASeqHumanTungiPSC, Biobase, assertthat,
-          rhondabacher/SCnorm, scater, scran, edgeR, DESeq, monocle, MAST
+          rhondabacher/SCnorm, scater, scran, edgeR, DESeq2, monocle, MAST
   lib_path: ../../R
