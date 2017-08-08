@@ -133,5 +133,5 @@ DSC:
   run:
     all: get_counts * simulate * (cpm, tmm, rle, census, scnorm) * (DESeq2, edgeR, limmaVoom, bpsc, mast, rots, scde)
   R_libs: jhsiao999/singleCellRNASeqHumanTungiPSC, Biobase, assertthat,
-          rhondabacher/SCnorm, scater, scran, edgeR, DESeq2, monocle, MAST
+          rhondabacher/SCnorm, scater, scran, edgeR, DESeq2, monocle, MAST, nghiavtr/BPSC
   lib_path: ../../R
