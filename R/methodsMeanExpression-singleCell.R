@@ -127,9 +127,9 @@ methodWrapper.mast <- function(counts, condition,
     # calculate cellualr detection rate; normalized to mean 0 and sd 1
     colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
     # the default method for fitting is bayesGLM
-    fit <- suppressMessages(MAST::zlm.SingleCellAssay(~ condition + cdr.normed, sca))
+    fit <- suppressMessages(MAST::zlm(~ condition + cdr.normed, sca))
   } else {
-    fit <-  suppressMessages(MAST::zlm.SingleCellAssay(~ condition, sca))
+    fit <-  suppressMessages(MAST::zlm(~ condition, sca))
   }
   
   # LRT test for the significance of the condition effect
