@@ -5,7 +5,7 @@
 # and subset samples belong to two conditions 
 # Also, exclude ERCC genes
 library(singleCellRNASeqHumanTungiPSC)
-HumanTungiPSC <- get(data("HumanTungiPSC"))
+eset <- get(data("HumanTungiPSC"))
 samplesToInclude <- which( pData(eset)$individual == "NA19239" & pData(eset)$replicate != "r3" )
 genesToInclude <- grep("ERCC", rownames(exprs(eset)), invert = TRUE)
 

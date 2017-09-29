@@ -209,9 +209,10 @@ normalize.scnorm <- function(counts, condition,
   if (!is.factor(condition)) {condition <- factor(condition)}
   
   #<--------------------------------------
+  suppressPackageStartupMessages(library(SummarizedExperiment))
   suppressPackageStartupMessages(library(SCnorm))
   scnorm_output <- suppressMessages(
-                      SCnorm::SCnorm(Data = counts, Conditions = condition,
+                      SCnorm(Data = counts, Conditions = condition,
                                       PLOT = F,
                                       FilterExpression = 1,
                                       FilterCellNum = control$FilterCellNum,

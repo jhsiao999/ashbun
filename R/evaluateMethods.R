@@ -1,3 +1,25 @@
+# evaluateMethods.R
+#
+# Description:
+#   This file contains high-level functions that combines and performs multiple methods,
+#   including methods for DE, normalization, and evaluation.
+#
+# Content (from higher to lower-level functions)
+#
+# query.evaluation: inputs a single count table and outputs evaluation results of
+#                   multiple normalization methods and DE methods
+#
+# query.pipeline: inputs a single count table, and outputs processed data and p-values of
+#                  multiple normalization methods and DE methods
+#
+#
+# query.methodsNormalization: input a single count table and outputs library size factors of
+#                   multiple normalization methods.
+#
+# query.methodsMeanExpression: inputs a single count table and outputs p-values of
+#                   multiple DE methods
+#
+
 #' @title Evaluate multiple normalization methods and multiple DE methods
 #'
 #' @examples
