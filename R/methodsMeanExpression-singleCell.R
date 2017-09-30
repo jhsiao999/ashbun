@@ -258,7 +258,6 @@ methodWrapper.scde <- function(counts, condition,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
   assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # convert condition to factor

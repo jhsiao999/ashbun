@@ -24,8 +24,7 @@ normalize.cpm <- function(counts, libsize_factors = rep(1, dim(counts)[2]),
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   #<--------------------------------------
   libsize <- colSums(counts)
   libsize_factors <- rep(1, dim(counts)[2])
@@ -50,8 +49,7 @@ normalize.tmm <- function(counts, control = list(NULL)) {
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   #<--------------------------------------
   libsize_factors <- edgeR::calcNormFactors(counts, method = "TMM")
 
@@ -76,8 +74,7 @@ normalize.rle <- function(counts, control = list(NULL)) {
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   #<--------------------------------------
   libsize_factors <- DESeq::estimateSizeFactorsForMatrix(counts)
 
@@ -107,8 +104,7 @@ normalize.census <- function(counts,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   #  assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # convert condition to factor
@@ -196,8 +192,7 @@ normalize.scnorm <- function(counts, condition,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # convert condition to factor
@@ -275,8 +270,7 @@ normalize.scran <- function(counts,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts))
-  
+
   #<--------------------------------------
   # construct SCE object
   suppressPackageStartupMessages(library(scater))
