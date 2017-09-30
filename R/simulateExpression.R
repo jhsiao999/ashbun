@@ -38,7 +38,7 @@
 #'
 #' sim_data_null <- simulationWrapper(counts,
 #'                               Ngenes = 100,
-#'                               Nsam = 20,
+#'                               Nsamples = 20,
 #'                               sample_method = "all_genes",
 #'                               pi0 = 1)
 #' 
@@ -104,35 +104,36 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamples = 50,
   output <- list(counts = counts)
   Nsamples_total <- 2*Nsamples
     
-  if (!is.null(Ngenes)) {
-    genes_to_include <- sample(1:NROW(counts), Ngenes, replace = FALSE)
-    counts_subset <- counts[genes_to_include, ]
-  } else {
-    counts_subset <- counts
-  }
-
   if (sample_method == "per_gene") {
     # For each gene, randomly select 2*Nsamp samples from counts
-    counts_subset <- t(apply(counts_subset, 1, sampleingene, Nsamples_total=Nsamples_total))
+    counts_subset <- t(apply(counts, 1, sampleingene, Nsamples_total=Nsamples_total))
     # Remove genes without any reads
     if ( sum(apply(counts_subset,1,sum) == 0) > 0) {
       counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
     } else {
       counts_subset <- counts_subset
     }
-    #Ngenes <- NROW(counts_subset)
-    output$counts <- counts_subset
+    # #Ngenes <- NROW(counts_subset)
+    # output$counts <- counts_subset
   }
 
   if (sample_method == "all_genes") {
     samples_to_include <- sample((1:NCOL(counts)), Nsamples_total, replace = TRUE)
-    counts_subset <- counts_subset[, samples_to_include]
+    counts_subset <- counts[, samples_to_include]
     # Remove genes without any reads
     counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
-    #Ngenes <- NROW(counts_subset)
-    output$counts <- counts_subset
+    # #Ngenes <- NROW(counts_subset)
+    # output$counts <- counts_subset
   }
 
+  if (!is.null(Ngenes)) {
+    genes_to_include <- sample(1:NROW(counts_subset), Ngenes, replace = FALSE)
+    counts_subset <- counts_subset[genes_to_include, ]
+    output$counts <- counts_subset
+  } else {
+    output$counts <- counts_subset
+  }
+  
   # assign samples to 2 arbitrary conditions
   condition <- rep(1:2, each = Nsamples)
   condition <- condition[sample(1:(Nsamples_total), size = Nsamples_total)]
