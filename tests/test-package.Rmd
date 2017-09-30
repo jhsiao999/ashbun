@@ -61,7 +61,7 @@ simdata_list <- simulationWrapper(counts, Nsim = 1,
 simdata <- simdata_list[[1]]
 
 # ---- gather evaluation results
-eval_ouptut <- query.evaluation(counts = simdata$counts,
+eval_output <- query.evaluation(counts = simdata$counts,
                                 condition = simdata$condition,
                                 is_nullgene = simdata$is_nullgene,
                                 methodsNormalize = c("TMM"),
