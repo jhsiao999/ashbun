@@ -99,7 +99,7 @@ simulationWrapper <- function(counts,
 #'                                   sample_method = "all_genes")
 #'
 #' @export
-makeSimCount2groups <- function(counts, Ngenes = NULL, Nsample = 50,
+makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamples = 50,
                                 sample_method = c("per_gene", "all_genes")){
   output <- list(counts = counts)
   Nsamples_total <- 2*Nsamples
