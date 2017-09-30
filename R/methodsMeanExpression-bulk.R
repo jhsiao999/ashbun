@@ -31,8 +31,7 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
-  assertthat::assert_that(is.integer(counts), 
-                          msg = "counts is not integer-values")
+  assertthat::assert_that(is.integer(counts))
   assertthat::assert_that(dim(counts)[2] == length(condition))
   
   # this gives errors... dont' know why

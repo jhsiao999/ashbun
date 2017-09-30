@@ -1,0 +1,83 @@
+---
+title: "test-package"
+date: "09-29-2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background and goals
+
+This document was created for testing the `ashbun` package on four UMI datasets. The goal is to run the codes without error.
+
+
+---
+
+## Analysis
+
+Load packages
+
+```{r}
+library(Biobase)
+library(ashbun)
+library(singleCellRNASeqMouseZeiselBrain)
+library(singleCellRNASeqHumanTungiPSC)
+library(singleCellRNASeqMouseKleinESC)
+```
+
+Convenient wrapper functions.
+
+```{r}
+eset <- get(data("MouseZeiselBrain"))
+counts <- exprs(eset)
+
+samples_any_gene <- which( colSums(counts) != 0)
+counts <- counts[,samples_any_gene]
+
+# samples_genes_10percent <- which(colMeans(counts > 0) > .1)
+# counts <- counts[,samples_genes_10percent]
+# dim(counts)
+# 
+# summary(colMeans(counts>0))
+
+genes_to_include <- which(apply(counts,1,sum)>0)
+counts <- counts[genes_to_include, ]
+dim(counts)
+
+
+# Call each dataset and run query.pipeline
+
+#---- generat simulated datasets
+simdata_list <- simulationWrapper(counts, Nsim = 1,
+                                  Ngenes = 1000,
+                                  Nsamples = 50,
+                                  sample_method = "all_genes",
+                                  pi0 = .9,
+                                  beta_args = args.big_normal(betapi = 1,
+                                                              betamu = 0, betasd = .8))
+
+simdata <- simdata_list[[1]]
+
+# ---- gather evaluation results
+eval_ouptut <- query.evaluation(counts = simdata$counts,
+                                condition = simdata$condition,
+                                is_nullgene = simdata$is_nullgene,
+                                methodsNormalize = c("TMM"),
+                                methodsMeanExpression = c("limmaVoom"),
+                                report = "fdr_cutoff_summary")
+
+```
+
+
+
+
+---
+
+## Session information
+
+```{r, echo = FALSE}
+sessionInfo()
+```
+
