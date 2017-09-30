@@ -52,7 +52,7 @@
 #'
 #' @export
 simulationWrapper <- function(counts,
-                              Nsim = 1, Nsample, Ngenes = NULL,
+                              Nsim = 1, Nsamples = 50, Ngenes = NULL,
                               pi0 = NULL,
                               sample_method = c("all_genes", "per_gene"),
                               beta_args = args.big_normal(betapi = c(1),
@@ -62,14 +62,14 @@ simulationWrapper <- function(counts,
     #  set.seed(999*i)
     if (pi0 == 1) {
       foo <- makeSimCount2groups(counts = counts,
-                                 Nsamp = Nsample, Ngenes = Ngenes,
+                                 Nsamples = Nsamples, Ngenes = Ngenes,
                                  sample_method = sample_method)
       return(foo)
     }
 
     if (pi0 < 1) {
       foo <- makeSimCount2groups(counts = counts,
-                                 Nsamp = Nsample, Ngenes = Ngenes,
+                                 Nsamples = Nsamples, Ngenes = Ngenes,
                                  sample_method = sample_method)
       foo2 <- non_null_sim(counts = foo$counts,
                            condition = foo$condition,
@@ -85,7 +85,7 @@ simulationWrapper <- function(counts,
 #'
 #' @param counts Gene expression count matrix from a dataset.
 #' @param Ngenes Number of genes in the simulated dataset.
-#' @param Nsamp Number of total samples in the simulated data.
+#' @param Nsample Number of samples in each condition.
 #' @param pi0 Proportion of null genes. Default to be 1.
 #'
 #' @examples
@@ -95,14 +95,15 @@ simulationWrapper <- function(counts,
 #'
 #' sim_counts <- makeSimCount2groups(counts,
 #'                                   Ngenes = 100,
-#'                                   Nsam = 20,
+#'                                   Nsample = 20,
 #'                                   sample_method = "all_genes")
 #'
 #' @export
-makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
+makeSimCount2groups <- function(counts, Ngenes = NULL, Nsample = 50,
                                 sample_method = c("per_gene", "all_genes")){
   output <- list(counts = counts)
-
+  Nsamples_total <- 2*Nsamples
+    
   if (!is.null(Ngenes)) {
     genes_to_include <- sample(1:NROW(counts), Ngenes, replace = FALSE)
     counts_subset <- counts[genes_to_include, ]
@@ -112,7 +113,7 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
 
   if (sample_method == "per_gene") {
     # For each gene, randomly select 2*Nsamp samples from counts
-    counts_subset <- t(apply(counts_subset, 1, sampleingene, Nsamp=Nsamp))
+    counts_subset <- t(apply(counts_subset, 1, sampleingene, Nsamples_total=Nsamples_total))
     # Remove genes without any reads
     if ( sum(apply(counts_subset,1,sum) == 0) > 0) {
       counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
@@ -124,7 +125,7 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
   }
 
   if (sample_method == "all_genes") {
-    samples_to_include <- sample((1:NCOL(counts)), Nsamp, replace = TRUE)
+    samples_to_include <- sample((1:NCOL(counts)), Nsamples_total, replace = TRUE)
     counts_subset <- counts_subset[, samples_to_include]
     # Remove genes without any reads
     counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
@@ -133,8 +134,8 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
   }
 
   # assign samples to 2 arbitrary conditions
-  condition <- rep(1:2, each = Nsamp/2)
-  condition <- condition[sample(1:(Nsamp), size = Nsamp)]
+  condition <- rep(1:2, each = Nsamples)
+  condition <- condition[sample(1:(Nsamples_total), size = Nsamples_total)]
   output$condition <- condition
 
   # reorder sample columns
@@ -152,11 +153,11 @@ makeSimCount2groups <- function(counts, Ngenes = NULL, Nsamp,
 #' @title Randomisation of sample at each gene
 #'
 #' @param count_onegene Count vector of one gene.
-#' @param Nsamp Total number of samples in the simulated data (both conditions included).
+#' @param Nsamp_total Total number of samples in the simulated data.
 #'
 #' @export
-sampleingene <- function(count_onegene, Nsamp){
-  sample_subset <- sample(length(count_onegene), Nsamp)
+sampleingene <- function(count_onegene, Nsamples_total){
+  sample_subset <- sample(length(count_onegene), Nsamples_total)
   return(c(count_onegene[sample_subset]))
 }
 
@@ -177,7 +178,7 @@ sampleingene <- function(count_onegene, Nsamp){
 #'
 #' counts_null <- makeSimCount2groups(counts,
 #'                                    Ngenes = 100,
-#'                                    Nsam = 20,
+#'                                    Nsamles = 20,
 #'                                    sample_method = "all_genes")
 #' counts_sim <- non_null_sim(counts_null$counts,
 #'                            counts_null$condition,
