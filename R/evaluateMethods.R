@@ -54,7 +54,7 @@
 query.evaluation <- function(counts, condition, is_nullgene,
                              methodsNormalize = c("TMM", "RLE", "census"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                             report.control = list(fdr_cutoff = .05)) {
+                             report.control = list(fdr_cutoff = .05), nsim = NULL) {
 
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
@@ -100,6 +100,9 @@ query.evaluation <- function(counts, condition, is_nullgene,
       }) )
       
     }) )
+    
+    output$fdr_cutoff$nsim <- nsim
+    output$roc$nsim <- nsim
     
     return(output)
   }
