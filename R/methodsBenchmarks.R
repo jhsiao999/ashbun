@@ -78,8 +78,30 @@ getROC <- function(response, predictor) {
 }
 
 
-
-
+#' @title Plot ROC curve average
+#'
+#' @param roc_output data.frame of roc output, including columns of true positive rate, 
+#'                  false positive rate, and simulation dataset index.
+#' @param length.out default 20. FPR is sorted and grouped into \code{length.out} internals.
+#'
+#' @return 
+#'    \code{output} data.frame of average true positive rates given false positive rates.
+#'    
+#' @export
+getROC.average <- function(roc_output, length.out = 20) {
+    range_fpr <- range(roc_output$FPR)
+    seq_fpr <- seq.int(from=range_fpr[1], to = range_fpr[2], length.out = length.out+1)
+    avg_tpr <- rep(NA, length.out+1)
+    for (index in 1:(length.out)) {
+      avg_tpr[index] <- with(roc_output, 
+                             mean( TPR[which(FPR >= seq_fpr[index] & FPR < seq_fpr[index+1])] ) ) 
+    }
+    output <- data.frame(TPR = avg_tpr, FPR = seq_fpr)
+    output <- output[!is.na(output$TPR),]
+    
+    return(output)
+}
+  
 # @param response Binary indicator of true/false. True = Non-null gene and FALSE = Null gene.
 # @param predictor Significance value (e.g., lfsr or p-value).
 # @param fdr_cutoff False Discovery Rate threshold.
