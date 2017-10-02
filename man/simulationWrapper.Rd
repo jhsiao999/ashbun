@@ -4,8 +4,8 @@
 \alias{simulationWrapper}
 \title{Wrapper for simulating M datasets}
 \usage{
-simulationWrapper(counts, Nsim = 1, Nsample, Ngenes = NULL, pi0 = NULL,
-  sample_method = c("all_genes", "per_gene"),
+simulationWrapper(counts, Nsim = 1, Nsamples = 50, Ngenes = NULL,
+  pi0 = NULL, sample_method = c("all_genes", "per_gene"),
   beta_args = args.big_normal(betapi = c(1), betamu = c(0), betasd = c(1)))
 }
 \arguments{
@@ -13,9 +13,9 @@ simulationWrapper(counts, Nsim = 1, Nsample, Ngenes = NULL, pi0 = NULL,
 
 \item{Nsim}{number of simulated datasets}
 
-\item{Nsample}{number of samples per biological condition}
-
 \item{Ngenes}{number of genes. Defaults to include all genes in the input data.}
+
+\item{Nsample}{number of samples per biological condition}
 }
 \value{
 List of data generated under three different fractions of null genes.
@@ -35,7 +35,7 @@ counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
 
 sim_data_null <- simulationWrapper(counts,
                               Ngenes = 100,
-                              Nsam = 20,
+                              Nsamples = 20,
                               sample_method = "all_genes",
                               pi0 = 1)
 

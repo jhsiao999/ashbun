@@ -66,21 +66,23 @@ query.evaluation <- function(counts, condition, is_nullgene,
   df_summarize <- results$pvals_longformat
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
 
-  if (report == "fdr_cutoff_summary") {
+  
+  output <- list(fdr_cutoff, roc)
+  
+  # find true positive rate given false discovery rate .05, 
     suppressPackageStartupMessages(library(dplyr))
-    output <- df_summarize %>%
+    output$fdr_cutoff <- df_summarize %>%
       group_by(methodsNormalize, methodsMeanExpression) %>%
       summarise(tpr = getTPR.pROC(response = is_nullgene,
-                                          predictor = pvalues))
-    return(output)
-   }
-
-  if (report == "roc_plot") {
+                                  predictor = pvalues,
+                                  fdr_cutoff = .05))
+    
+  # compute receiver operating curve
     list_methodsNormalize <- unique(results$pvals_longformat$methodsNormalize)
     list_methodsMeanExpression <- unique(results$pvals_longformat$methodsMeanExpression)
     is_nullgene <- results$data$is_nullgene
 
-    output <- do.call(rbind, lapply(seq_along(list_methodsNormalize),
+    output$roc <- do.call(rbind, lapply(seq_along(list_methodsNormalize),
                                     function(index_normalize) {
 
       one_methodsNormalize <- do.call(rbind, lapply(seq_along(list_methodsMeanExpression),
@@ -98,9 +100,9 @@ query.evaluation <- function(counts, condition, is_nullgene,
             return(foo)
       }) )
     }) )
+    
     return(output)
   }
-}
 
 
 

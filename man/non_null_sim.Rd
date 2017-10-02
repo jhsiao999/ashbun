@@ -23,7 +23,7 @@ counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
 
 counts_null <- makeSimCount2groups(counts,
                                    Ngenes = 100,
-                                   Nsam = 20,
+                                   Nsamles = 20,
                                    sample_method = "all_genes")
 counts_sim <- non_null_sim(counts_null$counts,
                            counts_null$condition,

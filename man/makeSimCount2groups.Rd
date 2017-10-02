@@ -4,7 +4,7 @@
 \alias{makeSimCount2groups}
 \title{Generate count matrix of all null genes}
 \usage{
-makeSimCount2groups(counts, Ngenes = NULL, Nsamp,
+makeSimCount2groups(counts, Ngenes = NULL, Nsamples = 50,
   sample_method = c("per_gene", "all_genes"))
 }
 \arguments{
@@ -12,7 +12,7 @@ makeSimCount2groups(counts, Ngenes = NULL, Nsamp,
 
 \item{Ngenes}{Number of genes in the simulated dataset.}
 
-\item{Nsamp}{Number of total samples in the simulated data.}
+\item{Nsample}{Number of samples in each condition.}
 
 \item{pi0}{Proportion of null genes. Default to be 1.}
 }
@@ -23,7 +23,7 @@ counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
 
 sim_counts <- makeSimCount2groups(counts,
                                   Ngenes = 100,
-                                  Nsam = 20,
+                                  Nsample = 20,
                                   sample_method = "all_genes")
 
 }

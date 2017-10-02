@@ -23,8 +23,8 @@ Load packages
 library(Biobase)
 library(ashbun)
 library(singleCellRNASeqMouseZeiselBrain)
-library(singleCellRNASeqHumanTungiPSC)
-library(singleCellRNASeqMouseKleinESC)
+#library(singleCellRNASeqHumanTungiPSC)
+#library(singleCellRNASeqMouseKleinESC)
 ```
 
 Convenient wrapper functions.
@@ -50,7 +50,7 @@ dim(counts)
 # Call each dataset and run query.pipeline
 
 #---- generat simulated datasets
-simdata_list <- simulationWrapper(counts, Nsim = 1,
+simdata_list <- simulationWrapper(counts, Nsim = 5,
                                   Ngenes = 1000,
                                   Nsamples = 50,
                                   sample_method = "all_genes",
@@ -61,13 +61,19 @@ simdata_list <- simulationWrapper(counts, Nsim = 1,
 simdata <- simdata_list[[1]]
 
 # ---- gather evaluation results
-eval_output <- query.evaluation(counts = simdata$counts,
-                                condition = simdata$condition,
-                                is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("TMM"),
-                                methodsMeanExpression = c("limmaVoom"),
-                                report = "fdr_cutoff_summary")
+eval_output_1 <- query.evaluation(counts = simdata$counts,
+                                 condition = simdata$condition,
+                                 is_nullgene = simdata$is_nullgene,
+                                 methodsNormalize = c("TMM"),
+                                 methodsMeanExpression = c("limmaVoom"),
+                                 report = "fdr_cutoff_summary")
 
+eval_output_2 <- query.evaluation(counts = simdata$counts,
+                                 condition = simdata$condition,
+                                 is_nullgene = simdata$is_nullgene,
+                                 methodsNormalize = c("TMM"),
+                                 methodsMeanExpression = c("limmaVoom"),
+                                 report = "roc_plot")
 ```
 
 
