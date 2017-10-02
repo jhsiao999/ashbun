@@ -5,6 +5,7 @@ Version: 0.1.0
 Authors: Chiaowen Joyce Hsiao
 Description: The package contains various tools for evaluating the various methods for modeling single cell abundance.
 Imports:
+    methods,
     assertthat,
     Biobase,
     ggplot2,

@@ -64,8 +64,8 @@ simdata <- simdata_list[[1]]
 eval_output <- query.evaluation(counts = simdata$counts,
                                 condition = simdata$condition,
                                 is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("RLE", "TMM"),
-                                methodsMeanExpression = c("limmaVoom"))
+                                methodsNormalize = c("TMM"),
+                                methodsMeanExpression = c("DESeq2", "limmaVoom"))
 
 
 library(ggplot2)
