@@ -66,7 +66,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
 
   
   output <- vector("list", 2)
-  names(output) <- c(fdr_cutoff, roc)
+  names(output) <- c("fdr_cutoff", "roc")
   
   # find true positive rate given false discovery rate .05, 
     suppressPackageStartupMessages(library(dplyr))
