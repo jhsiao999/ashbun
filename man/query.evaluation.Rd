@@ -6,7 +6,6 @@
 \usage{
 query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
   "RLE", "census"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
-  report = c("fdr_cutoff_summary", "roc_plot"),
   report.control = list(fdr_cutoff = 0.05))
 }
 \examples{

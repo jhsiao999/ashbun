@@ -76,7 +76,7 @@ normalize.rle <- function(counts, control = list(NULL)) {
   assertthat::assert_that(is.matrix(counts))
 
   #<--------------------------------------
-  libsize_factors <- DESeq::estimateSizeFactorsForMatrix(counts)
+  libsize_factors <- estimateSizeFactorsForMatrix(counts)
 
   return(list(libsize_factors = libsize_factors))
 }

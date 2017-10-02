@@ -9,7 +9,6 @@ Imports:
     Biobase,
     ggplot2,
     edgeR,
-    DESeq,
     DESeq2,
     limma,
     SCnorm,
