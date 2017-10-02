@@ -136,9 +136,9 @@ query.evaluation <- function(counts, condition, is_nullgene,
 #'
 #' @export
 query.pipeline <- function(counts, condition, is_nullgene = NULL,
-                           methodsNormalize = c("TMM", "RLE", "census","scran"),
+                           methodsNormalize = c("CPM", "TMM", "RLE", "census","scran"),
                            methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR",
-                                                     "BPSC", "MAST", "ROTS")) {
+                                                     "BPSC", "MAST", "ROTS", "scde")) {
 
   #----- filtering
   data_filtered <- filter.Wrapper(counts = counts,
@@ -232,14 +232,15 @@ query.pipeline <- function(counts, condition, is_nullgene = NULL,
 #'
 #' @export
 query.methodsNormalization <- function(counts, condition,
-                                       methodsNormalize = c("TMM", "RLE",
+                                       methodsNormalize = c("LIB", "TMM", "RLE",
                                                             "census", "SCnorm", "scran")) {
 
   # SCnorm is the only method that requires the input of condition/group variable
   # and is the only method that def. has different scale factors for different
   # gene groups
-  methods_same_for_genes <- c("TMM", "RLE", "census", "scran")
-  methods_same_for_genes_function <- c( "normalize.tmm",
+  methods_same_for_genes <- c("LIB", "TMM", "RLE", "census", "scran")
+  methods_same_for_genes_function <- c( "normalize.lib", 
+                                        "normalize.tmm",
                                         "normalize.rle",
                                         "normalize.census",
                                         "normalize.scran")

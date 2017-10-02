@@ -37,6 +37,27 @@ normalize.cpm <- function(counts, libsize_factors = rep(1, dim(counts)[2]),
 
 
 
+#' @title Library size normalization without adjustment
+#' 
+#' @description Scale factors equal 1 for all libraries
+#' 
+#' @param counts gene by sample expression count matrix (G by N).
+#' @param libsize_factors numreic vector of the scale factors for library sizes. 
+#'                        Default to 1 - no adjustment.
+#' 
+#' @param control List with control arguments, including
+#'
+#' @return 
+#'    \code{libsize_factors} numeric vector of the scale factors for library size.
+#'    
+#' @export
+normalize.lib <- function(counts, libsize_factors = rep(1, dim(counts)[2]),
+                          control = list(NULL)) {
+  return(list(libsize_factors = rep(1:ncol(counts))))
+}
+
+
+
 #' @title TMM 
 #'
 #' @param counts Gene by sample expression count matrix (G by N).

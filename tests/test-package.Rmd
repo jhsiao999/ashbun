@@ -67,9 +67,9 @@ registerDoParallel(cl)
 eval_output <- query.evaluation(counts = simdata$counts,
                                 condition = simdata$condition,
                                 is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("scran"),
+                                methodsNormalize = c("RLE"),
                                 methodsMeanExpression = c("limmaVoom"))
-                                # methodsNormalize = c("TMM", "RLE", "census","scran")
+                                # methodsNormalize = c("TMM", "census","scran")
                                 # methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE", 
                                 #                           "DESeq2", "edgeR", "limmaVoom"))
 

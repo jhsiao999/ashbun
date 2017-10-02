@@ -197,6 +197,9 @@ methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
   
   suppressPackageStartupMessages(library(limma))
   # don't apply normalization methods (eg., TMM, quantile)
+  # the default setting of voom.controlPseudocount is the same as
+  # in voom package; but here we made pseudocount and pseudo library size 
+  # adjustable by users
   weights <- voom.controlPseudocount(counts, design)
   fit <- limma::lmFit(log2CPM, design, weights = weights)
   fit.ebayes <- limma::eBayes(fit)
