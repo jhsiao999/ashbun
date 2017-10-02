@@ -18,6 +18,7 @@ Imports:
     BPSC,
     ROTS,
     scde,
+    flexmix (2.3-13),
     MAST
 Depends:
     R (>= 3.1.1)

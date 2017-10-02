@@ -253,7 +253,7 @@ methodWrapper.scde <- function(counts, condition,
                                control = list(save_modelFit = FALSE,
                                               n.randomizations = 100,
                                               n.cores = 4,
-                                              min.size.entries = round(ncol(counts)/2))) {
+                                              min.size.entries = ncol(counts))) {
   
   #--------------------------
   # Make sure input format is correct
@@ -263,6 +263,10 @@ methodWrapper.scde <- function(counts, condition,
   # convert condition to factor
   if (!is.factor(condition)) {condition <- factor(condition)}
   
+  # convert count table to integer
+  if (!is.integer(counts)) {
+    counts <- apply(counts, 2, function(x) { storage.mode(x) <- 'integer'; x})
+  }
   #<--------------------------------------
   # fitting error models, this step takes a considerable amount of time...
   o.ifm <- scde::scde.error.models(counts = counts, 
@@ -273,6 +277,7 @@ methodWrapper.scde <- function(counts, condition,
                                    save.crossfit.plots = FALSE, 
                                    save.model.plots = FALSE, 
                                    min.size.entries = control$min.size.entries, 
+                                   max.pairs = (min(table(condition)))^2,
                                    verbose = 0)
   
   # filter out cells that dont't show positive correlation with
