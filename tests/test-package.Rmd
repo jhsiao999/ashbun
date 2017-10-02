@@ -61,12 +61,11 @@ simdata_list <- simulationWrapper(counts, Nsim = 5,
 simdata <- simdata_list[[1]]
 
 # ---- gather evaluation results
-eval_output_1 <- query.evaluation(counts = simdata$counts,
-                                 condition = simdata$condition,
-                                 is_nullgene = simdata$is_nullgene,
-                                 methodsNormalize = c("TMM"),
-                                 methodsMeanExpression = c("limmaVoom"),
-                                 report = "fdr_cutoff_summary")
+eval_output <- query.evaluation(counts = simdata$counts,
+                                condition = simdata$condition,
+                                is_nullgene = simdata$is_nullgene,
+                                methodsNormalize = c("TMM"),
+                                methodsMeanExpression = c("limmaVoom"))
 
 eval_output_2 <- query.evaluation(counts = simdata$counts,
                                  condition = simdata$condition,
@@ -74,6 +73,8 @@ eval_output_2 <- query.evaluation(counts = simdata$counts,
                                  methodsNormalize = c("TMM"),
                                  methodsMeanExpression = c("limmaVoom"),
                                  report = "roc_plot")
+library(ggplot2)
+qplot(data = eval_output_2, x = FPR, y = TPR, geom = "path")
 ```
 
 

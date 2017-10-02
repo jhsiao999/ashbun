@@ -54,8 +54,6 @@
 query.evaluation <- function(counts, condition, is_nullgene,
                              methodsNormalize = c("TMM", "RLE", "census"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                             report = c("fdr_cutoff_summary",
-                                        "roc_plot"),
                              report.control = list(fdr_cutoff = .05)) {
 
   results <- query.pipeline(counts, condition, is_nullgene,
@@ -67,7 +65,8 @@ query.evaluation <- function(counts, condition, is_nullgene,
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
 
   
-  output <- list(fdr_cutoff, roc)
+  output <- vector("list", 2)
+  names(output) <- c(fdr_cutoff, roc)
   
   # find true positive rate given false discovery rate .05, 
     suppressPackageStartupMessages(library(dplyr))
