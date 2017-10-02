@@ -67,12 +67,15 @@ registerDoParallel(cl)
 eval_output <- query.evaluation(counts = simdata$counts,
                                 condition = simdata$condition,
                                 is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("TMM"),
-                                methodsMeanExpression = c("ROTS","limmaVoom"))
-SCDE
+                                methodsNormalize = c("scran"),
+                                methodsMeanExpression = c("limmaVoom"))
+                                # methodsNormalize = c("TMM", "RLE", "census","scran")
+                                # methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE", 
+                                #                           "DESeq2", "edgeR", "limmaVoom"))
 
 
-"BPSC", "MAST", "ROTS", "DESeq2", "edgeR", "limmaVoom"
+
+
 
 library(ggplot2)
 qplot(data = eval_output$roc, x = FPR, y = TPR, geom = "path", colour = methodsMeanExpression)

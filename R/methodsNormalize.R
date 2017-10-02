@@ -264,7 +264,7 @@ normalize.scnorm <- function(counts, condition,
 #' @export
 normalize.scran <- function(counts, 
                              control = list(save_modelFit = FALSE,
-                                            get_cell_clusters = TRUE,
+                                            get_cell_clusters = FALSE,
                                             min.size = 50
                                             )) {
   #--------------------------
@@ -278,10 +278,12 @@ normalize.scran <- function(counts,
   rownames(phenoData) <- phenoData$sampleID
   colnames(counts) <- phenoData$sampleID
   
-  sce <- newSCESet(countData=data.frame(counts),
-                   phenoData = new("AnnotatedDataFrame", 
-                                   data = phenoData) )
-  sce <- calculateQCMetrics(sce)
+  if (!is.integer(counts)) {
+    counts <- apply(counts, 2, function(x) { storage.mode(x) <- 'integer'; x})
+  }
+  
+  sce <- SingleCellExperiment(list(counts=counts))
+  sce <- computeSumFactors(sce)
   
   # cluster cells
   if (control$get_cell_clusters) {
@@ -289,17 +291,17 @@ normalize.scran <- function(counts,
 
     # scran requires the number of cells in each cluster should at leaset be
     # twice that of the larges pool size
-    control$sizes <- seq(10, round(min(table(cell_clusters))/2 ), by = 20)
+#    control$sizes <- seq(10, round(min(table(cell_clusters))/2 ), by = 20)
+    # re-compute size factors
+    scran_output <- scran::computeSumFactors(sce,
+                                             clusters = cell_clusters)
   } else {
     control$cell_clusters <- NULL
+    scran_output <- sce
   }
 
-  # compute size factors
-  scran_output <- scran::computeSumFactors(sce,
-                                           sizes = control$sizes,
-                                           clusters = cell_clusters)
   # extract size factors
-  libsize_factors <- scater::sizeFactors(scran_output)
+  libsize_factors <- sizeFactors(scran_output)
   
   # normalization
   # dont' use their method for computing CPM, I don't know how they compute CPM
