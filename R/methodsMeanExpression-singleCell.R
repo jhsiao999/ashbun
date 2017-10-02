@@ -194,10 +194,10 @@ methodWrapper.rots <- function(counts, condition,
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(dim(counts)[2] == length(condition))
+  assertthat::assert_that(is.numeric(condition))
   
   counts <- as.matrix(counts)
-  if (!is.factor(condition)) {condition <- factor(condition)}
-  
+
   #<--------------------------------------
   # fitting model
   fit <- suppressMessages( ROTS::ROTS(data = counts,
