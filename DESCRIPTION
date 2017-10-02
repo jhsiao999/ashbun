@@ -16,6 +16,7 @@ Imports:
     scran,
     scater,
     BPSC,
+    monocle,
     ROTS,
     scde,
     MAST
