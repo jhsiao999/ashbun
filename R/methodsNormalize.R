@@ -288,6 +288,7 @@ normalize.scran <- function(counts,
                                             get_cell_clusters = FALSE,
                                             min.size = 50
                                             )) {
+  library(scran)
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(is.matrix(counts))
