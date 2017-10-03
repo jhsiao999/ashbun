@@ -94,7 +94,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
             foo <- data.frame(TPR = roc_output$sensitivities,
                               FPR = 1- roc_output$specificities,
                               methodsMeanExpression = list_methodsMeanExpression[index_meanExpression],
-                              methodsNormlize = list_methodsNormalize[index_normalize])
+                              methodsNormalize = list_methodsNormalize[index_normalize])
             foo <- foo[foo$FPR < .2, ]
             return(foo)
       }) )
