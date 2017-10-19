@@ -6,7 +6,7 @@
 \usage{
 query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
   "RLE", "census"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
-  report.control = list(fdr_cutoff = 0.05))
+  report.control = list(fdr_cutoff = 0.05), nsim = NULL)
 }
 \examples{
 ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))

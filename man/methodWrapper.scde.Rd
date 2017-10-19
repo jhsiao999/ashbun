@@ -5,8 +5,7 @@
 \title{SCDE}
 \usage{
 methodWrapper.scde(counts, condition, control = list(save_modelFit = FALSE,
-  n.randomizations = 100, n.cores = 4, min.size.entries =
-  round(ncol(counts)/2)))
+  n.randomizations = 100, n.cores = 4, min.size.entries = ncol(counts)))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}

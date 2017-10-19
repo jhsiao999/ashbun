@@ -173,13 +173,13 @@ sampleingene <- function(count_onegene, Nsamples_total){
 #'   \code{pi0}: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)
 #'
 #' @examples
-#' library(singleCellRNASeqHumanTungiPSC)
-#' eset <- HumanTungiPSC
-#' counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
+#' library(singleCellRNASeqMouseZeiselBrain)
+#' eset <- get(data(MouseZeiselBrain))
+#' counts <- exprs(eset)
 #'
 #' counts_null <- makeSimCount2groups(counts,
-#'                                    Ngenes = 100,
-#'                                    Nsamles = 20,
+#'                                    Ngenes = 1000,
+#'                                    Nsamples = 20,
 #'                                    sample_method = "all_genes")
 #' counts_sim <- non_null_sim(counts_null$counts,
 #'                            counts_null$condition,

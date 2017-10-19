@@ -5,9 +5,9 @@
 \title{Run multiple normalization methods and multiple DE methods}
 \usage{
 query.pipeline(counts, condition, is_nullgene = NULL,
-  methodsNormalize = c("TMM", "RLE", "census", "scran"),
+  methodsNormalize = c("CPM", "TMM", "RLE", "census", "scran"),
   methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR", "BPSC", "MAST",
-  "ROTS"))
+  "ROTS", "scde"))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).

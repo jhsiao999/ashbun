@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This document was created for testing the `ashbun` package on four UMI datasets. The goal is to run the codes without error.
 
-
 ---
 
 ## Analysis
@@ -27,7 +26,7 @@ library(singleCellRNASeqMouseZeiselBrain)
 #library(singleCellRNASeqMouseKleinESC)
 ```
 
-Convenient wrapper functions.
+Test for one simulated single cell data.
 
 ```{r}
 eset <- get(data("MouseZeiselBrain"))
@@ -50,7 +49,7 @@ dim(counts)
 # Call each dataset and run query.pipeline
 
 #---- generat simulated datasets
-simdata_list <- simulationWrapper(counts, Nsim = 5,
+simdata_list <- simulationWrapper(counts, Nsim = 1,
                                   Ngenes = 1000,
                                   Nsamples = 50,
                                   sample_method = "all_genes",
@@ -63,24 +62,69 @@ simdata <- simdata_list[[1]]
 library(doParallel)
 cl <- makeCluster(8)
 registerDoParallel(cl)
+
 # ---- gather evaluation results
-eval_output <- query.evaluation(counts = simdata$counts,
-                                condition = simdata$condition,
-                                is_nullgene = simdata$is_nullgene,
-                                methodsNormalize = c("RLE"),
-                                methodsMeanExpression = c("limmaVoom"))
-                                # methodsNormalize = c("TMM", "census","scran")
-                                # methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE", 
-                                #                           "DESeq2", "edgeR", "limmaVoom"))
+output  <- query.evaluation(counts = simdata$counts,
+                            condition = simdata$condition,
+                            is_nullgene = simdata$is_nullgene,
+                            methodsNormalize = c("LIB", "TMM", "census","scran"),
+                            methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE",
+                                                      "DESeq2", "edgeR", "limmaVoom"))
 
+library(ggplot2)
+qplot(x = FPR, y = TPR, data = output$roc, 
+      colour = methodsMeanExpression, 
+      facets = ~ methodsNormalize,
+      geom = "path")
+```
 
+Run on 2 simulated data.
 
+```{r}
+simdata_list <- simulationWrapper(counts, Nsim = 2,
+                                  Ngenes = 1000,
+                                  Nsamples = 50,
+                                  sample_method = "all_genes",
+                                  pi0 = .9,
+                                  beta_args = args.big_normal(betapi = 1,
+                                                              betamu = 0, betasd = .8))
+
+output <- vector("list", 2)
+for (index in 1:length(output)) {
+  output[[index]]  <- query.evaluation(counts = simdata_list[[index]]$counts,
+                            condition = simdata_list[[index]]$condition,
+                            is_nullgene = simdata_list[[index]]$is_nullgene,
+                            methodsNormalize = c("LIB", "TMM", "census","scran"),
+                            methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE",
+                                                      "DESeq2", "edgeR", "limmaVoom"),
+                            nsim = index)
+}
+
+# summarize ROC results
+roc_combined <- do.call(rbind, lapply(output, "[[", 2))
+roc_average <- do.call(rbind, lapply(1:nlevels(roc_combined$methodsNormalize),
+                                     function(index_methodsNormalize) {
+    foo2 <- 
+      do.call(rbind, lapply(1:nlevels(roc_combined$methodsMeanExpression), 
+                            function(index_methodsMeanExpression) {
+              roc_combined_subset <- subset(roc_combined, 
+                               subset = methodsMeanExpression %in% methodsMeanExpression[index_methodsMeanExpression] & methodsNormalize %in% methodsNormalize[index_methodsNormalize] )
+              foo <- getROC.average(roc_combined_subset) 
+              foo$methodsMeanExpression <- unique(methodsMeanExpression[index_methodsMeanExpression])
+              return(foo) 
+              }) )
+    foo2$methodsNormalize <- unique(methodsNormalize[index_methodsNormalize])
+    return(foo2)
+  }) )
 
 
 library(ggplot2)
-qplot(data = eval_output$roc, x = FPR, y = TPR, geom = "path", colour = methodsMeanExpression)
+qplot(data = roc_average, 
+      x = FPR, y = TPR, 
+      colour = methodsMeanExpression, 
+      facets = ~ methodsNormalize,
+      geom = "path")
 ```
-
 
 
 

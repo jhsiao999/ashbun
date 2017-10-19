@@ -5,7 +5,7 @@
 \title{scran}
 \usage{
 normalize.scran(counts, control = list(save_modelFit = FALSE,
-  get_cell_clusters = TRUE, min.size = 50))
+  get_cell_clusters = FALSE, min.size = 50))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}

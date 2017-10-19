@@ -4,8 +4,8 @@
 \alias{query.methodsNormalization}
 \title{Run multiple normalization methods}
 \usage{
-query.methodsNormalization(counts, condition, methodsNormalize = c("TMM",
-  "RLE", "census", "SCnorm", "scran"))
+query.methodsNormalization(counts, condition, methodsNormalize = c("LIB",
+  "TMM", "RLE", "census", "SCnorm", "scran"))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). Use filtered count data.}
