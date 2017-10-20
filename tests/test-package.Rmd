@@ -1,6 +1,6 @@
 ---
 title: "test-package"
-date: "09-29-2017"
+date: "10-19-2017"
 output: html_document
 ---
 
@@ -18,7 +18,7 @@ This document was created for testing the `ashbun` package on four UMI datasets.
 
 Load packages
 
-```{r}
+```{r, eval = TRUE}
 library(Biobase)
 library(ashbun)
 library(singleCellRNASeqMouseZeiselBrain)
@@ -28,25 +28,17 @@ library(singleCellRNASeqMouseZeiselBrain)
 
 Test for one simulated single cell data.
 
-```{r}
+```{r, eval = FALSE}
 eset <- get(data("MouseZeiselBrain"))
 counts <- exprs(eset)
 
 samples_any_gene <- which( colSums(counts) != 0)
 counts <- counts[,samples_any_gene]
 
-# samples_genes_10percent <- which(colMeans(counts > 0) > .1)
-# counts <- counts[,samples_genes_10percent]
-# dim(counts)
-# 
-# summary(colMeans(counts>0))
-
 genes_to_include <- which(apply(counts,1,sum)>0)
 counts <- counts[genes_to_include, ]
 dim(counts)
 
-
-# Call each dataset and run query.pipeline
 
 #---- generat simulated datasets
 simdata_list <- simulationWrapper(counts, Nsim = 1,
@@ -70,17 +62,23 @@ output  <- query.evaluation(counts = simdata$counts,
                             methodsNormalize = c("LIB", "TMM", "census","scran"),
                             methodsMeanExpression = c("BPSC", "MAST", "ROTS", "SCDE",
                                                       "DESeq2", "edgeR", "limmaVoom"))
+results.one.data <- saveRDS(output, file = "tests.results.one.data.rds")
+```
 
+
+```{r}
+results.one.data <- readRDS(file = "tests.results.one.data.rds")
 library(ggplot2)
-qplot(x = FPR, y = TPR, data = output$roc, 
+qplot(x = FPR, y = TPR, data = results.one.data$roc, 
       colour = methodsMeanExpression, 
       facets = ~ methodsNormalize,
       geom = "path")
 ```
 
+
 Run on 2 simulated data.
 
-```{r}
+```{r, eval = FALSE}
 simdata_list <- simulationWrapper(counts, Nsim = 2,
                                   Ngenes = 1000,
                                   Nsamples = 50,
@@ -99,24 +97,31 @@ for (index in 1:length(output)) {
                                                       "DESeq2", "edgeR", "limmaVoom"),
                             nsim = index)
 }
+results.multiple.data <- saveRDS(output, file = "tests.results.multiple.data.rds")
+```
+
+
+```{r}
+results.multiple.data <- readRDS(file = "tests.results.multiple.data.rds")
 
 # summarize ROC results
-roc_combined <- do.call(rbind, lapply(output, "[[", 2))
+roc_combined <- do.call(rbind, lapply(results.multiple.data, "[[", 2))
 roc_average <- do.call(rbind, lapply(1:nlevels(roc_combined$methodsNormalize),
                                      function(index_methodsNormalize) {
+    normMethod <- levels(roc_combined$methodsNormalize)[index_methodsNormalize]
     foo2 <- 
       do.call(rbind, lapply(1:nlevels(roc_combined$methodsMeanExpression), 
                             function(index_methodsMeanExpression) {
+              meanMethod <- levels(roc_combined$methodsMeanExpression)[index_methodsMeanExpression]
               roc_combined_subset <- subset(roc_combined, 
-                               subset = methodsMeanExpression %in% methodsMeanExpression[index_methodsMeanExpression] & methodsNormalize %in% methodsNormalize[index_methodsNormalize] )
+                  subset = methodsMeanExpression %in%  meanMethod & methodsNormalize %in% normMethod )
               foo <- getROC.average(roc_combined_subset) 
-              foo$methodsMeanExpression <- unique(methodsMeanExpression[index_methodsMeanExpression])
+              foo$methodsMeanExpression <- meanMethod 
               return(foo) 
               }) )
-    foo2$methodsNormalize <- unique(methodsNormalize[index_methodsNormalize])
+    foo2$methodsNormalize <- normMethod
     return(foo2)
   }) )
-
 
 library(ggplot2)
 qplot(data = roc_average, 

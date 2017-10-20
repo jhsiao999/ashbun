@@ -22,6 +22,10 @@
 
 #' @title Evaluate multiple normalization methods and multiple DE methods
 #'
+#' @param thresholdDetection minimum count per gene/sample. Default value = 1.
+#' @param fractionExpressed fraction of samples expressed (above thresholdDetection).
+#'        Default value = .01.
+#'
 #' @examples
 #' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
 #' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
@@ -54,28 +58,31 @@
 query.evaluation <- function(counts, condition, is_nullgene,
                              methodsNormalize = c("TMM", "RLE", "census"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
+                             thresholdDetection = 1, fractionExpressed = .01
                              report.control = list(fdr_cutoff = .05), nsim = NULL) {
 
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
-                  methodsMeanExpression = methodsMeanExpression)
+                  methodsMeanExpression = methodsMeanExpression,
+                  thresholdDetection = thresholdDetection,
+                  fractionExpressed = fractionExpressed)
 
   num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
   df_summarize <- results$pvals_longformat
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
 
-  
+
   output <- vector("list", 2)
   names(output) <- c("fdr_cutoff", "roc")
-  
-  # find true positive rate given false discovery rate .05, 
+
+  # find true positive rate given false discovery rate .05,
     suppressPackageStartupMessages(library(dplyr))
     output$fdr_cutoff <- df_summarize %>%
       group_by(methodsNormalize, methodsMeanExpression) %>%
       summarise(tpr = getTPR.pROC(response = is_nullgene,
                                   predictor = pvalues,
                                   fdr_cutoff = .05))
-    
+
   # compute receiver operating curve
     list_methodsNormalize <- unique(results$pvals_longformat$methodsNormalize)
     list_methodsMeanExpression <- unique(results$pvals_longformat$methodsMeanExpression)
@@ -98,12 +105,12 @@ query.evaluation <- function(counts, condition, is_nullgene,
             foo <- foo[foo$FPR < .2, ]
             return(foo)
       }) )
-      
+
     }) )
-    
+
     output$fdr_cutoff$nsim <- nsim
     output$roc$nsim <- nsim
-    
+
     return(output)
   }
 
@@ -141,11 +148,14 @@ query.evaluation <- function(counts, condition, is_nullgene,
 query.pipeline <- function(counts, condition, is_nullgene = NULL,
                            methodsNormalize = c("CPM", "TMM", "RLE", "census","scran"),
                            methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR",
-                                                     "BPSC", "MAST", "ROTS", "scde")) {
+                                                     "BPSC", "MAST", "ROTS", "scde"),
+                           thresholdDetection = 1, fractionExpressed = .01) {
 
   #----- filtering
   data_filtered <- filter.Wrapper(counts = counts,
                                   condition = condition,
+                                  thresholdDetection = thresholdDetection,
+                                  fractionExpressed = fractionExpressed,
                                   is_nullgene = is_nullgene)
 
   #----- normalization
@@ -242,12 +252,13 @@ query.methodsNormalization <- function(counts, condition,
   # and is the only method that def. has different scale factors for different
   # gene groups
   methods_same_for_genes <- c("LIB", "TMM", "RLE", "census", "scran")
-  methods_same_for_genes_function <- c( "normalize.lib", 
+  methods_same_for_genes_function <- c( "normalize.lib",
                                         "normalize.tmm",
                                         "normalize.rle",
                                         "normalize.census",
                                         "normalize.scran")
   which_methods_same_for_genes <- which(methods_same_for_genes %in% methodsNormalize)
+
 
   methods_diff_for_genes <- c("SCnorm")
   methods_diff_for_genes_function <- "normalize.scnorm"
@@ -265,23 +276,27 @@ query.methodsNormalization <- function(counts, condition,
     scalefactors_same_for_genes[[index]] <- output$libsize_factors
   }
 
-  # run methods that apply different scale factors for every gene
-  scalefactors_diff_for_genes <- vector("list",
-                                        length = length(which_methods_diff_for_genes))
-  names(scalefactors_diff_for_genes) <- methods_diff_for_genes[which_methods_diff_for_genes]
-  for (index in seq_along(which_methods_diff_for_genes)) {
-    index_method <- which_methods_diff_for_genes[index]
-    cat(methods_diff_for_genes[index_method], "\n")
-    output <- do.call(methods_diff_for_genes_function[index_method],
-                      list(counts = counts, condition = condition))
-    scalefactors_diff_for_genes[[index]] <- output
+  if (length(which_methods_diff_for_genes) == 0) {
+    libsize_factors <- list(scalefactors_same_for_genes = scalefactors_same_for_genes)
+   }
+
+  if (length(which_methods_diff_for_genes) != 0) {
+    # run methods that apply different scale factors for every gene
+    scalefactors_diff_for_genes <- vector("list",
+                                          length = length(which_methods_diff_for_genes))
+    names(scalefactors_diff_for_genes) <- methods_diff_for_genes[which_methods_diff_for_genes]
+    for (index in seq_along(which_methods_diff_for_genes)) {
+      index_method <- which_methods_diff_for_genes[index]
+      cat(methods_diff_for_genes[index_method], "\n")
+      output <- do.call(methods_diff_for_genes_function[index_method],
+                        list(counts = counts, condition = condition))
+      scalefactors_diff_for_genes[[index]] <- output
+    }
+    libsize_factors <- list(scalefactors_same_for_genes = scalefactors_same_for_genes,
+                            scalefactors_diff_for_genes = scalefactors_diff_for_genes)
+    libsize_factors <- c(scalefactors_same_for_genes,
+                         scalefactors_diff_for_genes)
   }
-
-
-  libsize_factors <- list(scalefactors_same_for_genes = scalefactors_same_for_genes,
-                          scalefactors_diff_for_genes = scalefactors_diff_for_genes)
-  libsize_factors <- c(scalefactors_same_for_genes,
-                       scalefactors_diff_for_genes)
 
   return(libsize_factors)
 }
