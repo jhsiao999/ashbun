@@ -47,7 +47,9 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
 
   # input size factors
   dds <- DESeq2::estimateSizeFactors(dds)
-  DESeq2::sizeFactors(dds) <- libsize_factors
+
+  # sizeFactors(dds) <- libsize_factors
+  colData(dds)[["sizeFactor"]] <- libsize_factor 
 
   # Run DE analysis
   dds <- DESeq(dds, quiet = TRUE)
