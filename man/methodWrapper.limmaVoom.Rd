@@ -17,7 +17,7 @@ methodWrapper.limmaVoom(counts, condition, pseudocount = 0.5,
 \item{control}{List with control arguments, including
 \code{save_modelFit} TRUE to output the complete limmaVoom fit results.}
 
-\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+\item{libsize_factors}{Numeric vector of scale factors for library sizes.
 Default NULL multiplies all library sizes by 1.}
 }
 \value{
@@ -29,7 +29,7 @@ List with the following objects
    \code{fit} limmaVoom complete output of the model fit.
 }
 \description{
-Implement limma with voom and apply the empirical Bayes method 
+Implement limma with voom and apply the empirical Bayes method
    in limma.
 }
 \author{

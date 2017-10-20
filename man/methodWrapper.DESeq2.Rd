@@ -13,7 +13,7 @@ methodWrapper.DESeq2(counts, condition, libsize_factors = NULL,
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
 
-\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+\item{libsize_factors}{Numeric vector of scale factors for library sizes.
 Default NULL computes libsize_factors using DESeq2.}
 
 \item{control}{A list with control arguments, including

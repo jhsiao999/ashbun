@@ -12,7 +12,7 @@ methodWrapper.edgeR(counts, condition, libsize_factors = NULL,
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
 
-\item{libsize_factors}{Numeric vector of scale factors for library sizes. 
+\item{libsize_factors}{Numeric vector of scale factors for library sizes.
 Default NULL computes libsize_factors using edgeR.}
 
 \item{control}{List with control arguments, including

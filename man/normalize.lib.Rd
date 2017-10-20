@@ -10,7 +10,7 @@ normalize.lib(counts, libsize_factors = rep(1, dim(counts)[2]),
 \arguments{
 \item{counts}{gene by sample expression count matrix (G by N).}
 
-\item{libsize_factors}{numreic vector of the scale factors for library sizes. 
+\item{libsize_factors}{numreic vector of the scale factors for library sizes.
 Default to 1 - no adjustment.}
 
 \item{control}{List with control arguments, including}

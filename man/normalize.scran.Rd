@@ -14,14 +14,14 @@ normalize.scran(counts, control = list(save_modelFit = FALSE,
 \code{save_modelFit} TRUE to output the complete SCnorm output.
 \code{get_cell_clusters} TRUE/FALSE to use scran to cluster cells and then estimate
                          size factors by cell clusters.
-\code{min.size} scran internal argument. Integer scalar specifying the minimum size 
+\code{min.size} scran internal argument. Integer scalar specifying the minimum size
                 of each cluster. Default to be 50.}
 }
 \value{
 \code{libsize_factors} numeric vector of the scale factors for library size.
 }
 \description{
-The most recent version of scran depends on R > 3.4. 
+The most recent version of scran depends on R > 3.4.
              I use scran 1.2.2, which depeneds on R.3.3.0. One difference that I have found
              so far is about SCESet - in the older version, the spike-in variable is a binary
              vector of yes/no, and in the newer version, the spike-in variable is a numeric

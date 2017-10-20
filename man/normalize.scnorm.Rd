@@ -14,10 +14,10 @@ normalize.scnorm(counts, condition, control = list(save_modelFit = FALSE,
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete SCnorm output.
-\code{FilterCellNum} SCnorm argument. Minimum number of cells required to 
+\code{FilterCellNum} SCnorm argument. Minimum number of cells required to
                      estimate the count-depth relationship.
-\code{K} SCnorm argument. Number of quantile groups. 
-         Default NULL: letting SCnorm find the optimal K. 
+\code{K} SCnorm argument. Number of quantile groups.
+         Default NULL: letting SCnorm find the optimal K.
 \code{Ncores} SCnorm argument. Number of cores to use. Default 4.
 \code{useSpikes} SCnorm argument. Whether to use spike-ins to perform the between-condition
                  scaling using spike-ins. Assume that the spike-in labels start with ERCC

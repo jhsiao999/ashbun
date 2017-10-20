@@ -14,6 +14,6 @@ normalize.rle(counts, control = list(NULL))
 }
 \description{
 DESeq was used to implement RLE. Note that we chose to use the implementation by
-             the developer of the method. edgeR also implments a version of RLE, which gives 
+             the developer of the method. edgeR also implments a version of RLE, which gives
              different results: (calcNormFactors(method = "RLE"))
 }

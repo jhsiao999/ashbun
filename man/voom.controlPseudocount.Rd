@@ -20,9 +20,9 @@ voom.controlPseudocount(counts, design, pseudocount = 0.5,
 \code{w} Weights of dimension G by N.
 }
 \description{
-Implement limma with voom and apply the empirical Bayes method 
-   in limma. This is a modified version of voom which allows to specify pseudocount and 
-   pseudo library size. 
+Implement limma with voom and apply the empirical Bayes method
+   in limma. This is a modified version of voom which allows to specify pseudocount and
+   pseudo library size.
    Hence, voom: y <- t(log2(t(counts + pseudocount)/(lib.size + pseudo_libsizes) * 1e+06)).
 }
 \author{
