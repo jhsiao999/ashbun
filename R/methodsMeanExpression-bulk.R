@@ -49,8 +49,8 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   # dds <- DESeq2::estimateSizeFactors(dds)
   # sizeFactors(dds) <- libsize_factors
   # colData(dds)[["sizeFactor"]] <- libsize_factors
-  SummarizedExperiment::colData(dds) <- S4Vectors::DataFrame(condition, sizeFactor = libsize_factor)
-  
+  SummarizedExperiment::colData(dds) <- S4Vectors::DataFrame(condition, sizeFactor = libsize_factors)
+
   # Run DE analysis
   dds <- DESeq(dds, quiet = TRUE)
 
