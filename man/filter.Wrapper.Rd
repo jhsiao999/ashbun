@@ -4,10 +4,16 @@
 \alias{filter.Wrapper}
 \title{Wrapper for all filtering steps}
 \usage{
-filter.Wrapper(counts, condition, is_nullgene = NULL)
+filter.Wrapper(counts, condition, thresholdDetection = 1,
+  fractionExpressed = 0.01, is_nullgene = NULL)
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}
+
+\item{thresholdDetection}{minimum count per gene/sample. Default value = 1.}
+
+\item{fractionExpressed}{fraction of samples expressed (above thresholdDetection).
+Default value = .01.}
 }
 \value{
 \code{counts} filtered count matrix.

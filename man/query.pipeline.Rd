@@ -7,7 +7,7 @@
 query.pipeline(counts, condition, is_nullgene = NULL,
   methodsNormalize = c("CPM", "TMM", "RLE", "census", "scran"),
   methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR", "BPSC", "MAST",
-  "ROTS", "scde"))
+  "ROTS", "scde"), thresholdDetection = 1, fractionExpressed = 0.01)
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).

@@ -12,14 +12,14 @@ methodWrapper.bpsc(counts, condition, control = list(save_modelFit = FALSE,
 to be normalized expression matrix, such as FPKM or CPM.}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.
-#' @param libsize_factors Numeric vector of scale factors for library sizes. 
+#' @param libsize_factors Numeric vector of scale factors for library sizes.
                       Default NULL multiplies all library sizes by 1.}
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{estIntPar} BPSC internal argument (TRUE/FALSE) for using only the expressed
                  genes to compute parameter estimates.
-\code{useParalle} BPSC internal argument (TRUE/FALSE) for using code written for 
+\code{useParalle} BPSC internal argument (TRUE/FALSE) for using code written for
                  parallel computing.}
 }
 \value{

@@ -21,15 +21,15 @@ methodWrapper.scde(counts, condition, control = list(save_modelFit = FALSE,
 }
 \value{
 List with the following objects
-   \code{sig_order} Z-socres of expression difference, ordered from the most 
+   \code{sig_order} Z-socres of expression difference, ordered from the most
                     significant to the least significant.
    \code{fit} SCDE complete output of the model fit.
 }
 \description{
-Implement SCDE 1.99.1. This older version of SCDE is need for computers
-              that are compatible with an older version of flexmix (flexmix_2.3-13; 
+Implement SCDE 1.99.2. This older version of SCDE is need for computers
+              that are compatible with an older version of flexmix (flexmix_2.3-13;
               for related discussions on this, see https://github.com/hms-dbmi/scde/issues/40).
-              Currently, this function uses the SCDE method for normalizatino and 
+              Currently, this function uses the SCDE method for normalizatino and
               does not allow using other normalization factors.
 }
 \author{

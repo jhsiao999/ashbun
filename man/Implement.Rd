@@ -13,7 +13,7 @@ methodWrapper.rots(counts, condition, control = list(save_modelFit = FALSE,
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). MAST requires the default
-input to be log2CPM. In this function, the required input is 
+input to be log2CPM. In this function, the required input is
 normalized expression counts, such as CPM. log2CPM is computed internally.}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
@@ -22,8 +22,8 @@ normalized expression counts, such as CPM. log2CPM is computed internally.}
 
 \item{control}{A list with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
-\code{include_cdr} MAST internal argument. TRUE if include cellular detection 
-                   rate (fraction of genes detected per sample) as a covariate 
+\code{include_cdr} MAST internal argument. TRUE if include cellular detection
+                   rate (fraction of genes detected per sample) as a covariate
                    (scaled to mean 0 and standard deviation 1).}
 
 \item{counts}{Gene by sample expression count matrix (G by N). ROTS requires this input
@@ -34,7 +34,7 @@ to be normalized expression matrix, such as FPKM or CPM.}
 \item{control}{List with control arguments, including
 \code{save_modelFit} TRUE to output the complete DESeq2 fit results.
 \code{B} ROTS internal argument: Number of bootstraps. Default 100.
-\code{seed} ROTS internal argument: An integer seed for the random number generator. 
+\code{seed} ROTS internal argument: An integer seed for the random number generator.
             Default NULL.}
 }
 \value{
@@ -42,14 +42,14 @@ List with the following objects
    \code{betahat} The estimate effect size of condition for all genes.
    \code{sebetahat} The standard errors of the effect sizes.
    \code{df} The degrees of freedom associated with the effect sizes.
-   \code{pvalue} P-values of the effect sizes from the likelihood ratio test of 
-                 the hurdle model, which combines the continous and the discrete 
-                 component (the above betahat, sebetahat, and df are extracted from 
+   \code{pvalue} P-values of the effect sizes from the likelihood ratio test of
+                 the hurdle model, which combines the continous and the discrete
+                 component (the above betahat, sebetahat, and df are extracted from
                  the continuous component.)
    \code{fit} MAST complete output of the model fit.
 
 A list with the following objects
-   \code{sig_order} Z-socres of expression difference, ordered from the most 
+   \code{sig_order} Z-socres of expression difference, ordered from the most
                     significant to the least significant.
    \code{fit} ROTS complete output of the model fit.
 }
