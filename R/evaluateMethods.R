@@ -56,7 +56,7 @@
 #'
 #' @export
 query.evaluation <- function(counts, condition, is_nullgene,
-                             methodsNormalize = c("TMM", "RLE", "census"),
+                             methodsNormalize = c("LIB", "TMM", "RLE","census","SCnorm","scran"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
                              thresholdDetection = 1, fractionExpressed = .01,
                              report.control = list(fdr_cutoff = .05), nsim = NULL) {
@@ -146,7 +146,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
 #'
 #' @export
 query.pipeline <- function(counts, condition, is_nullgene = NULL,
-                           methodsNormalize = c("CPM", "TMM", "RLE", "census","scran"),
+                           methodsNormalize = c("LIB", "TMM", "RLE", "census","SCnorm","scran"),
                            methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR",
                                                      "BPSC", "MAST", "ROTS", "scde"),
                            thresholdDetection = 1, fractionExpressed = .01) {
@@ -170,10 +170,11 @@ query.pipeline <- function(counts, condition, is_nullgene = NULL,
   pvals_list <- vector("list", length = length(methodsNormalize))
   names(pvals_list) <- methodsNormalize
 
+  # consider methods that use that same scaling factors for each gene
   for (index in 1:length(methodsNormalize)) {
 
     counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
-    libsize_factors <- libsize_factors_list[[index]]
+    libsize_factors <- libsize_factors_list$scalefactors_same_for_genes[[index]]
     pvals_list[[index]] <- query.methodsMeanExpression(
                                   counts = counts_filtered,
                                   counts_normed = counts_normed,
