@@ -30,7 +30,11 @@ filter.Wrapper <- function(counts, condition,
   counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
   condition_filtered <- condition[samplesToInclude]
 
-  if (!is.null(is_nullgene)) { is_nullgene_filtered <- is_nullgene[featuresToInclude]}
+  if (!is.null(is_nullgene)) {
+    is_nullgene_filtered <- is_nullgene[featuresToInclude]
+    } else {
+    is_nullgene_filtered <- NULL
+    }
 
   return(list(counts = counts_filtered,
               condition = condition_filtered,
