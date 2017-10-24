@@ -5,7 +5,7 @@
 \title{Run multiple normalization methods and multiple DE methods}
 \usage{
 query.pipeline(counts, condition, is_nullgene = NULL,
-  methodsNormalize = c("CPM", "TMM", "RLE", "census", "scran"),
+  methodsNormalize = c("LIB", "TMM", "RLE", "census", "SCnorm", "scran"),
   methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR", "BPSC", "MAST",
   "ROTS", "scde"), thresholdDetection = 1, fractionExpressed = 0.01)
 }

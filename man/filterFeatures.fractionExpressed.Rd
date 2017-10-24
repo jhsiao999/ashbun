@@ -4,8 +4,8 @@
 \alias{filterFeatures.fractionExpressed}
 \title{Filter genes by fraction of samples detected as expressed}
 \usage{
-filterFeatures.fractionExpressed(counts, thresholdDetection = 1,
-  fractionExpressed = 0.25, control = list(plot = FALSE))
+filterFeatures.fractionExpressed(counts, condition, thresholdDetection = 1,
+  fractionExpressed = 0.01, control = list(plot = FALSE))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}
@@ -20,6 +20,6 @@ qualified as "detected as expressed".}
 }
 \value{
 List of the following objects
-   \code{fraction_expressed} fraction of samples qualified as "expressed".
+   \code{fraction_expressed_cond} fraction of samples qualified as "expressed" in each condition.
    \code{index_filter} TRUE/FALSE passing the filter.
 }

@@ -4,10 +4,11 @@
 \alias{query.evaluation}
 \title{Evaluate multiple normalization methods and multiple DE methods}
 \usage{
-query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("TMM",
-  "RLE", "census"), methodsMeanExpression = c("DESeq2", "limmaVoom"),
-  thresholdDetection = 1, fractionExpressed = 0.01,
-  report.control = list(fdr_cutoff = 0.05), nsim = NULL)
+query.evaluation(counts, condition, is_nullgene, methodsNormalize = c("LIB",
+  "TMM", "RLE", "census", "SCnorm", "scran"),
+  methodsMeanExpression = c("DESeq2", "limmaVoom"), thresholdDetection = 1,
+  fractionExpressed = 0.01, report.control = list(fdr_cutoff = 0.05),
+  nsim = NULL)
 }
 \arguments{
 \item{thresholdDetection}{minimum count per gene/sample. Default value = 1.}
