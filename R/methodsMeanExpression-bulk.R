@@ -51,11 +51,11 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   # colData(dds)[["sizeFactor"]] <- libsize_factors
   # SummarizedExperiment::colData(dds) <- S4Vectors::DataFrame(condition,
   # sizeFactor =  libsize_factors)
-  names(libsize_factors) <- names(dds@colData@listData$sizeFactor)
+  names(libsize_factors) <- colnames(counts)
   dds@colData@listData$sizeFactor <- libsize_factors
 
   # Run DE analysis
-  dds <- DESeq(dds, quiet = TRUE)
+  dds <- DESeq(dds, quiet = FALSE)
 
   # Call results table without any arguments
   # this will extract the estimated log2 fold changes and p values for the
