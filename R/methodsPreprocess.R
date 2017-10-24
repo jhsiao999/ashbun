@@ -20,12 +20,13 @@ filter.Wrapper <- function(counts, condition,
 
   counts_filtered <- filter.excludeAllZeros(counts)
   featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
-                                                        thresholdDetection = 1,
-                                                        fractionExpressed = .01)$index_filter
+                            condition=condition,
+                            thresholdDetection=thresholdDetection,
+                            fractionExpressed=fractionExpressed)$index_filter
 
   samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
-                                                       thresholdDetection = 1,
-                                                       fractionExpressed = .01)$index_filter
+                            thresholdDetection=thresholdDetection,
+                            fractionExpressed=fractionExpressed)$index_filter
 
   counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
   condition_filtered <- condition[samplesToInclude]
@@ -73,17 +74,19 @@ filter.excludeAllZeros <- function(counts) {
 #'   \code{plot} TRUE/FALSE to output diagnositic plot.
 #'
 #' @return List of the following objects
-#'    \code{fraction_expressed} fraction of samples qualified as "expressed".
+#'    \code{fraction_expressed_cond} fraction of samples qualified as "expressed" in each condition.
 #'    \code{index_filter} TRUE/FALSE passing the filter.
 #'
 #' @export
-filterFeatures.fractionExpressed <- function(counts,
+filterFeatures.fractionExpressed <- function(counts, condition,
                                              thresholdDetection = 1,
-                                             fractionExpressed = .25,
+                                             fractionExpressed = .01,
                                              control = list(plot=FALSE)) {
-
- fraction_expressed <- rowMeans(counts > thresholdDetection)
- index_filter <- which(fraction_expressed > fractionExpressed)
+ condition_vals <- unique(condition)
+ fraction_expressed_cond <- lapply(unique(condition), function(index) {
+          tmp <- rowMeans(counts[, condition==condition_vals[index]] > thresholdDetection)
+          return(tmp) })
+ index_filter <- which(fraction_expressed_cond[[1]] > fractionExpressed & fraction_expressed_cond[[2]] > fractionExpressed)
 
  if (control$plot) {
 
@@ -94,7 +97,7 @@ filterFeatures.fractionExpressed <- function(counts,
      geom_vline(xintercept = fractionExpressed, col = "red")
  }
 
- return(list(fraction_expressed = fraction_expressed,
+ return(list(fraction_expressed_cond = fraction_expressed_cond,
              index_filter = index_filter))
 }
 
