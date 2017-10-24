@@ -184,7 +184,7 @@ makeSimCount2groups.filter <- function(counts, Ngenes = NULL,
 }
 
 
----------------------------------------------------------------
+#---------------------------------------------------------------
 
 #' @title Wrapper for simulating M datasets
 #'
