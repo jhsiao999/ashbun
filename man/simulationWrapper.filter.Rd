@@ -6,7 +6,7 @@
 \usage{
 simulationWrapper.filter(counts, Nsim = 1, Nsamples = 50, Ngenes = NULL,
   pi0 = NULL, sample_method = c("all_genes", "per_gene"),
-  sampleFractionExpressed = 0.25, featureFractionExpressed = 0.25,
+  samplesFractionExpressed = 0.25, featuresFractionExpressed = 0.25,
   thresholdDetection = 1, beta_args = args.big_normal(betapi = c(1), betamu
   = c(0), betasd = c(1)))
 }

@@ -60,8 +60,8 @@ simulationWrapper.filter <- function(counts,
                               Nsim = 1, Nsamples = 50, Ngenes = NULL,
                               pi0 = NULL,
                               sample_method = c("all_genes", "per_gene"),
-                              sampleFractionExpressed=.25,
-                              featureFractionExpressed=.25,
+                              samplesFractionExpressed=.25,
+                              featuresFractionExpressed=.25,
                               thresholdDetection=1,
                               beta_args = args.big_normal(betapi = c(1),
                                                           betamu = c(0),
@@ -74,7 +74,7 @@ simulationWrapper.filter <- function(counts,
     # filter samples
     samplesToInclude.filter <-  filterSamples.fractionExpressed(counts,
                                     thresholdDetection=thresholdDetection,
-                                    fractionExpressed=sampleFractionExpressed)$index_filter
+                                    fractionExpressed=samplesFractionExpressed)$index_filter
     # subset samples
     counts_subset <- counts[, samplesToInclude.filter]
 
