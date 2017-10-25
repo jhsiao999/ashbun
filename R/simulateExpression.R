@@ -104,11 +104,15 @@ simulationWrapper.filter <- function(counts,
     colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
 
     # filter genes
-    featuresToInclude <- filterFeatures.fractionExpressed(output$counts,
+    featuresToInclude.filter <- filterFeatures.fractionExpressed(output$counts,
                               condition=output$condition,
                               thresholdDetection=thresholdDetection,
                               fractionExpressed=featuresFractionExpressed)$index_filter
-    output$counts <- output$counts[featuresToInclude, ]
+    output$counts <- output$counts[featuresToInclude.filter, ]
+
+    # select random subset of genes
+    featuresToInclude.permute <- sample(1:NROW(counts), Ngenes, replace = FALSE)
+    output$counts <- output$counts[featuresToInclude.permute, ]
 
     #  set.seed(999*i)
     if (pi0 < 1) {
