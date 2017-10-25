@@ -155,9 +155,9 @@ query.pipeline <- function(counts, condition, is_nullgene = NULL,
 #                                  thresholdDetection = thresholdDetection,
 #                                  fractionExpressed = fractionExpressed,
 #                                  is_nullgene = is_nullgene)
-  data_filtered <- list(counts = counts_filtered,
-                        condition = condition_filtered,
-                        is_nullgene = is_nullgene_filtered)
+  data_filtered <- list(counts = counts,
+                        condition = condition,
+                        is_nullgene = is_nullgene)
 
   #----- normalization
   libsize_factors_list <- with(data_filtered,
