@@ -111,7 +111,7 @@ simulationWrapper.filter <- function(counts,
     output$counts <- output$counts[featuresToInclude.filter, ]
 
     # select random subset of genes
-    featuresToInclude.permute <- sample(1:NROW(counts), Ngenes, replace = FALSE)
+    featuresToInclude.permute <- sample(1:NROW(output$counts), Ngenes, replace = FALSE)
     output$counts <- output$counts[featuresToInclude.permute, ]
 
     #  set.seed(999*i)
