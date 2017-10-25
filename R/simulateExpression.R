@@ -66,6 +66,8 @@ simulationWrapper.filter <- function(counts,
                               beta_args = args.big_normal(betapi = c(1),
                                                           betamu = c(0),
                                                           betasd = c(1))) {
+  output <- list(counts = counts)
+
   Nsamples_total <- 2*Nsamples
 
   simdata <- lapply(1:Nsim, function(i) {
@@ -75,11 +77,11 @@ simulationWrapper.filter <- function(counts,
                                     fractionExpressed=sampleFractionExpressed)$index_filter
     # subset samples
     counts_subset <- counts[, samplesToInclude.filter]
-    
+
     # choose a random set of samples
     samplesToInclude.permute <- sample((1:NCOL(counts_subset)), Nsamples_total, replace = FALSE)
     counts_subset <- counts_subset[, samplesToInclude.permute]
-  
+
     # permute sample labels
     if (sample_method == "per_gene") {
      #For each gene, randomly select 2*Nsamp samples from counts
@@ -88,19 +90,19 @@ simulationWrapper.filter <- function(counts,
     if (sample_method == "all_genes") {
       counts_perm <- counts_subset
     }
-    
+
     # assign samples to 2 arbitrary conditions
     condition <- rep(1:2, each = Nsamples)
     condition <- condition[sample(1:(Nsamples_total), size = Nsamples_total)]
     output$condition <- condition
-    
+
     # reorder sample columns
     output$condition <- output$condition[order(output$condition)]
     output$counts <- counts_perm[, order(output$condition)]
-    
+
     # make colnames be unique
     colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
-    
+
     # filter genes
     featuresToInclude <- filterFeatures.fractionExpressed(output$counts,
                               condition=output$condition,
