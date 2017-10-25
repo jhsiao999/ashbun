@@ -114,6 +114,12 @@ simulationWrapper.filter <- function(counts,
     featuresToInclude.permute <- sample(1:NROW(output$counts), Ngenes, replace = FALSE)
     output$counts <- output$counts[featuresToInclude.permute, ]
 
+    # add rownames if null
+    # make pseudo rownames
+    if (is.null(rownames(output$counts))) {
+    rownames(output$counts) <-paste0("feature_", c(1:dim(output$counts)[1]))
+    }
+
     #  set.seed(999*i)
     if (pi0 < 1) {
       data_signal <- non_null_sim(counts = output$counts,

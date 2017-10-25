@@ -131,11 +131,6 @@ normalize.census <- function(counts,
   # convert condition to factor
   #  if (!is.factor(condition)) {condition <- factor(condition)}
 
-  # make pseudo rownames for census
-  if (is.null(rownames(counts))) {
-  rownames(counts) <-paste0("feature_", c(1:dim(counts)[1]))
-  }
-
   #<--------------------------------------
   # construct Monocle object
   suppressPackageStartupMessages(library(monocle))
