@@ -62,6 +62,7 @@ simulationWrapper.filter <- function(counts,
                               sample_method = c("all_genes", "per_gene"),
                               sampleFractionExpressed=.25,
                               featureFractionExpressed=.25,
+                              thresholdDetection=1,
                               beta_args = args.big_normal(betapi = c(1),
                                                           betamu = c(0),
                                                           betasd = c(1))) {
