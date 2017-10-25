@@ -75,37 +75,46 @@ simulationWrapper.filter <- function(counts,
                                     fractionExpressed=sampleFractionExpressed)$index_filter
     # subset samples
     counts_subset <- counts[, samplesToInclude.filter]
+    
     # choose a random set of samples
     samplesToInclude.permute <- sample((1:NCOL(counts_subset)), Nsamples_total, replace = FALSE)
     counts_subset <- counts_subset[, samplesToInclude.permute]
-
+  
+    # permute sample labels
+    if (sample_method == "per_gene") {
+     #For each gene, randomly select 2*Nsamp samples from counts
+      counts_perm <- t(apply(counts_subset, 1, sampleingene, Nsamples_total=Nsamples_total))
+      }
+    if (sample_method == "all_genes") {
+      counts_perm <- counts_subset
+    }
+    
+    # assign samples to 2 arbitrary conditions
+    condition <- rep(1:2, each = Nsamples)
+    condition <- condition[sample(1:(Nsamples_total), size = Nsamples_total)]
+    output$condition <- condition
+    
+    # reorder sample columns
+    output$condition <- output$condition[order(output$condition)]
+    output$counts <- counts_perm[, order(output$condition)]
+    
+    # make colnames be unique
+    colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
+    
     # filter genes
-    featuresToInclude <- filterFeatures.fractionExpressed(counts_subset,
-                              condition=condition,
+    featuresToInclude <- filterFeatures.fractionExpressed(output$counts,
+                              condition=output$condition,
                               thresholdDetection=thresholdDetection,
                               fractionExpressed=featuresFractionExpressed)$index_filter
-    counts_subset <- counts_subset[featuresToInclude, ]
-
+    output$counts <- output$counts[featuresToInclude, ]
 
     #  set.seed(999*i)
-    if (pi0 == 1) {
-
-      foo <- makeSimCount2groups.filter(counts = counts_subset,
-                                        Ngenes = Ngenes,
-                                        sample_method = sample_method)
-      return(foo)
-    }
-
     if (pi0 < 1) {
-
-      foo <- makeSimCount2groups.filter(counts = counts_subset,
-                                        Ngenes = Ngenes,
-                                        sample_method = sample_method)
-      foo2 <- non_null_sim(counts = foo$counts,
-                           condition = foo$condition,
+      data_signal <- non_null_sim(counts = output$counts,
+                           condition = output$condition,
                            pi0,
                            beta_args = beta_args)
-      return(foo2)
+      return(data_signal)
     }
   })
 }
