@@ -64,11 +64,13 @@ query.evaluation <- function(counts, condition, is_nullgene,
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
                   methodsMeanExpression = methodsMeanExpression)
+  message("Analysis done!", "\n")
 
   num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
   df_summarize <- results$pvals_longformat
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
 
+  message("Evaluating results", "\n")
 
   output <- vector("list", 2)
   names(output) <- c("fdr_cutoff", "roc")
@@ -105,6 +107,7 @@ query.evaluation <- function(counts, condition, is_nullgene,
       }) )
 
     }) )
+    message("DONE!", "\n")
 
     output$fdr_cutoff$nsim <- nsim
     output$roc$nsim <- nsim
