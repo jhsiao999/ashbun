@@ -162,7 +162,7 @@ query.pipeline <- function(counts, condition, is_nullgene = NULL,
   #----- normalization
   libsize_factors_list <- with(data_filtered,
                                query.methodsNormalization(counts = counts,
-                                                          condition = counts,
+                                                          condition = condition,
                                                           methodsNormalize = methodsNormalize))
 
   #---- run DE methods
