@@ -67,8 +67,11 @@ query.evaluation <- function(counts, condition, is_nullgene,
   message("Analysis done!", "\n")
 
   num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
+  print(1)
   df_summarize <- results$pvals_longformat
+  print(2)
   df_summarize$is_nullgene <- rep(results$data$is_nullgene, num_evals)
+  print(3)
 
   message("Evaluating results", "\n")
 
