@@ -58,14 +58,12 @@
 query.evaluation <- function(counts, condition, is_nullgene,
                              methodsNormalize = c("LIB", "TMM", "RLE","census","SCnorm","scran"),
                              methodsMeanExpression = c("DESeq2", "limmaVoom"),
-                             thresholdDetection = 1, fractionExpressed = .01,
+#                             thresholdDetection = 1, fractionExpressed = .01,
                              report.control = list(fdr_cutoff = .05), nsim = NULL) {
 
   results <- query.pipeline(counts, condition, is_nullgene,
                   methodsNormalize = methodsNormalize,
-                  methodsMeanExpression = methodsMeanExpression,
-                  thresholdDetection = thresholdDetection,
-                  fractionExpressed = fractionExpressed)
+                  methodsMeanExpression = methodsMeanExpression)
 
   num_evals <- dim(results$pvals_longformat)[1]/length(results$data$is_nullgene)
   df_summarize <- results$pvals_longformat
@@ -148,15 +146,18 @@ query.evaluation <- function(counts, condition, is_nullgene,
 query.pipeline <- function(counts, condition, is_nullgene = NULL,
                            methodsNormalize = c("LIB", "TMM", "RLE", "census","SCnorm","scran"),
                            methodsMeanExpression = c("DESeq2", "limmaVoom", "edgeR",
-                                                     "BPSC", "MAST", "ROTS", "scde"),
-                           thresholdDetection = 1, fractionExpressed = .01) {
+                                                     "BPSC", "MAST", "ROTS", "scde")) {
+#                           thresholdDetection = 1, fractionExpressed = .01) {
 
   #----- filtering
-  data_filtered <- filter.Wrapper(counts = counts,
-                                  condition = condition,
-                                  thresholdDetection = thresholdDetection,
-                                  fractionExpressed = fractionExpressed,
-                                  is_nullgene = is_nullgene)
+#  data_filtered <- filter.Wrapper(counts = counts,
+#                                  condition = condition,
+#                                  thresholdDetection = thresholdDetection,
+#                                  fractionExpressed = fractionExpressed,
+#                                  is_nullgene = is_nullgene)
+  data_filtered <- list(counts = counts_filtered,
+                        condition = condition_filtered,
+                        is_nullgene = is_nullgene_filtered)
 
   #----- normalization
   libsize_factors_list <- with(data_filtered,
