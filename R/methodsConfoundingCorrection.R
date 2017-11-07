@@ -5,7 +5,7 @@
 #'
 #' @param object gene by sample expression matrix. Can be
 #' @param condition Binary vector of length N indicating sample biological condition.
-#' @num_sv number of surrogate variables
+#' @param num_sv number of surrogate variables
 #'
 #' @export
 methodWrapper.num_sv <- function(object, condition) {
@@ -19,7 +19,7 @@ methodWrapper.num_sv <- function(object, condition) {
 #'
 #' @param count_matrix gene by sample expression matrix. Can be
 #' @param design_matrix Binary vector of length N indicating sample biological condition.
-#' @num_sv number of surrogate variables
+#' @param num_sv number of surrogate variables
 #'
 #' @export
 methodWrapper.sva <- function(count_matrix, design_matrix, num_sv){

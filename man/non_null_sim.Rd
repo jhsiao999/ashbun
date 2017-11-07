@@ -4,12 +4,30 @@
 \alias{non_null_sim}
 \title{Simulate count matrix}
 \usage{
-non_null_sim(counts, args)
+non_null_sim(counts, condition, pi0, beta_args = list(betapi, betamu, betasd))
 }
 \arguments{
 \item{counts}{G*N null count matrix, rows are genes and columns are samples}
 
 \item{args}{List of arguments, including
-- betaargs: parameters for the normal mixture distribution to generate signals
-- pi0: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)}
+\code{beta_args}: parameters for normal mixture distributions.
+     \code{betapi} Probability vector for the k components in the normal mixture.
+     \code{betamu} Mean vector for k mixture components.
+     \code{betasd} Standard deviation vector for k mixture components.
+\code{pi0}: null proportion. If pi0=="random" then pi0 will be randomly selected from U(0,1)}
+}
+\examples{
+library(singleCellRNASeqMouseZeiselBrain)
+eset <- get(data(MouseZeiselBrain))
+counts <- exprs(eset)
+
+counts_null <- makeSimCount2groups(counts,
+                                   Ngenes = 1000,
+                                   Nsamples = 20,
+                                   sample_method = "all_genes")
+counts_sim <- non_null_sim(counts_null$counts,
+                           counts_null$condition,
+                           pi0 = .5,
+                           beta_args = args.big_normal())
+
 }

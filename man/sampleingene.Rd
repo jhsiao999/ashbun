@@ -4,10 +4,10 @@
 \alias{sampleingene}
 \title{Randomisation of sample at each gene}
 \usage{
-sampleingene(count_onegene, Nsamp)
+sampleingene(count_onegene, Nsamples_total)
 }
 \arguments{
 \item{count_onegene}{Count vector of one gene.}
 
-\item{Nsamp}{Total number of samples in the simulated data (both conditions included).}
+\item{Nsamp_total}{Total number of samples in the simulated data.}
 }

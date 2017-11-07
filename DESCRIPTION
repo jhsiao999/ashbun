@@ -2,10 +2,30 @@ Package: ashbun
 Maintainer: Chiaowen Joyce Hsiao <joyce.hsiao1@gmail.com>
 Title: Methods and evaluation tools for single cell RNA-seq count data
 Version: 0.1.0
-Authors: Chiaowen Joyce Hsiao
-Description: The package contains various tools for evaluating the various methods for modeling single cell abundance.
+Authors@R: person("Chiaowen Joyce", "Hsiao", 
+	email = "joyce.hsiao@gmail.com",
+	role = c("aut", "cre"))
+Description: The package contains various tools for evaluating the various methods for differential expression analysis for RNA sequencing data.
+Imports:
+    methods,
+    assertthat,
+    Biobase,
+    ggplot2,
+    edgeR,
+    DESeq2,
+    limma,
+    SCnorm,
+    scran,
+    scater,
+    BPSC,
+    monocle,
+    ROTS,
+    scde,
+    MAST
 Depends:
     R (>= 3.1.1)
+Suggests:
+    testthat
 License: GPL (>=2)
 LazyData: true
 Encoding: ASCII

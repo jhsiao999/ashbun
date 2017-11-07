@@ -10,4 +10,6 @@ methodWrapper.num_sv(object, condition)
 \item{object}{gene by sample expression matrix. Can be}
 
 \item{condition}{Binary vector of length N indicating sample biological condition.}
+
+\item{num_sv}{number of surrogate variables}
 }
