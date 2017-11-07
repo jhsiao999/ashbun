@@ -4,5 +4,5 @@
 \alias{args.bimodal}
 \title{bimodal prior}
 \usage{
-args.bimodal(nsamp, pi0 = "random")
+args.bimodal(...)
 }

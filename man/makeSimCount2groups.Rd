@@ -4,15 +4,26 @@
 \alias{makeSimCount2groups}
 \title{Generate count matrix of all null genes}
 \usage{
-makeSimCount2groups(counts, Ngene = NULL, Nsamp,
-  sample_method = c("per_gene", "all_genes"), control = list(pi0 = NULL))
+makeSimCount2groups(counts, Ngenes = NULL, Nsamples = 50,
+  sample_method = c("per_gene", "all_genes"))
 }
 \arguments{
-\item{counts}{Gene expression count matrix from a dataset (usually consisting of one biological condition).}
+\item{counts}{Gene expression count matrix from a dataset.}
 
-\item{Ngene}{Number of genes in the simulated dataset.}
+\item{Ngenes}{Number of genes in the simulated dataset.}
 
-\item{Nsamp}{Number of samples per condition in the simulated data.}
+\item{Nsample}{Number of samples in each condition.}
 
-\item{nullpi}{Proportion of null genes.}
+\item{pi0}{Proportion of null genes. Default to be 1.}
+}
+\examples{
+library(singleCellRNASeqHumanTungiPSC)
+eset <- HumanTungiPSC
+counts <- exprs(eset)[,pData(eset)$individual == "NA19101"]
+
+sim_counts <- makeSimCount2groups(counts,
+                                  Ngenes = 100,
+                                  Nsample = 20,
+                                  sample_method = "all_genes")
+
 }

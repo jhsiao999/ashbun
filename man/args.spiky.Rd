@@ -4,5 +4,5 @@
 \alias{args.spiky}
 \title{spiky prior}
 \usage{
-args.spiky(nsamp, pi0 = "random")
+args.spiky(...)
 }

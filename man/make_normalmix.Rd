@@ -4,21 +4,25 @@
 \alias{make_normalmix}
 \title{Generate beta (effects) from normal mixture prior}
 \usage{
-make_normalmix(ngene, pi, mu, sd, pi0)
+make_normalmix(Ngenes, pi0, beta_args = list(betapi, betamu, betasd))
 }
 \arguments{
-\item{ngene}{Total number of genes (null + non-null in the data).}
+\item{Ngenes}{Total number of genes (null + non-null in the data).}
+
+\item{pi0}{Proportion of null genes.Default = "random", which selects a random number between 0 and 1 from a uniform distribution.}
 
 \item{pi}{K-component probability vector. K = number of components in the mixture prior.}
 
 \item{mu}{Length-K mean vector of the mixture components.}
 
 \item{sd}{Length-K standard error vector of the mixture components.}
-
-\item{pi0}{Proportion of null genes.Default = "random", which selects a random number between 0 and 1 from a uniform distribution.}
 }
 \value{
-null Binary vector of length ngene. 1 = null, 0 = no null.
+null Binary vector of length Ngenes. 1 = null, 0 = no null.
 
 scalar value pi0 proportion of null
+}
+\examples{
+betas <- make_normalmix(100, pi = .5,
+                        beta_args = args.big_normal())
 }

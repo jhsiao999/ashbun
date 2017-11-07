@@ -4,5 +4,5 @@
 \alias{args.near_normal}
 \title{near normal prior}
 \usage{
-args.near_normal(nsamp, pi0 = "random")
+args.near_normal(...)
 }

@@ -2,14 +2,18 @@
 % Please edit documentation in R/simulateExpression.R
 \name{args.big_normal}
 \alias{args.big_normal}
-\title{big normal prior}
+\title{Normal mixture prior. Default 1 component.}
 \usage{
-args.big_normal(nsamp, betasd = 1, pi0 = "random")
+args.big_normal(betapi = c(1), betamu = c(0), betasd = c(1))
 }
 \arguments{
-\item{nsamp}{Number of samples per group}
+\item{betapi}{Probabliy vector of k components in the normal mixture.}
+
+\item{betamu}{Mean vector of k components in the normal mixture.}
 
 \item{betasd}{Standard deviation of the effect sizes.}
+
+\item{Nsamp}{Number of samples per group}
 
 \item{pi0}{Fraction of null genes. Default = Random.}
 }

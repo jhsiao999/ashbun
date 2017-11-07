@@ -4,5 +4,5 @@
 \alias{args.flat_top}
 \title{flat top prior}
 \usage{
-args.flat_top(nsamp, pi0 = "random")
+args.flat_top(...)
 }
