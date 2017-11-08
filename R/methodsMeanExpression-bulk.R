@@ -23,6 +23,7 @@
 #'
 #' @export
 methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
+                                 default = FALSE,
                                  control = list(save_modelFit = FALSE,
                                                 independentFiltering = FALSE,
                                                 cooksCutoff = FALSE)){
@@ -44,14 +45,14 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   dds <- DESeq2::DESeqDataSetFromMatrix(counts, S4Vectors::DataFrame(condition), ~ condition)
 
   # input pre-defined size factor    
-  if (!is.null(libsize_factors)) {
+  if (default == FALSE) {
     dds <- DESeq2::estimateSizeFactors(dds)
     names(libsize_factors) <- colnames(counts)
     dds@colData@listData$sizeFactor <- libsize_factors
   }
   
   # use DESeq size factor
-  if (is.null(libsize_factors)) {
+  if (default == TRUE) {
     dds <- DESeq2::estimateSizeFactors(dds)
   }
   
@@ -69,6 +70,7 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   sebetahat <- res$lfcSE
   df <- nrow(colData(dds)) - ncol(model.matrix(design(dds)))
   pvalue <- res$pvalue
+  names(pvalue) <- rownames(dds)
 
   # if save_modelFit, then output will include the original model fit
   if (control$save_modelFit) {
@@ -106,7 +108,8 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
 #'
 #' @export
 methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
-                                 control = list(save_modelFit = FALSE)) {
+                                default = FALSE,
+                                control = list(save_modelFit = FALSE)) {
 
   #--------------------------
   # Make sure input format is correct
@@ -115,24 +118,19 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
   counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
 
-  # This gives erros... don't know why...
-  # assertthat::assert_that(length(unique(condition)) != 2,
-  #                         msg = "condition vector only allows 2 groups")
-
-
   #<--------------------------------------
   # Make "DGEList" object
-  if (!is.null(libsize_factors)) {
+  if (default == FALSE) {
     dge <- edgeR::DGEList(counts = counts,
                           group = condition,
                           genes = rownames(counts),
                           norm.factors = libsize_factors)
   }
-  if (is.null(libsize_factors)) {
+  if (default == TRUE) {
     dge <- edgeR::DGEList(counts = counts,
                           group = condition,
                           genes = rownames(counts))
-    dge <- calcNormFactors(dge, method = "TMM")
+    dge <- edgeR::calcNormFactors(dge, method = "TMM")
   }
 
   # estimate dispersion
@@ -148,7 +146,8 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
   betahat <- lrt$coefficients[,2]
   df <- lrt$df.residual
   pvalue <- lrt$table$PValue
-
+  names(pvalue) <- rownames(fit)
+  
   # if save_modelFit, then output will include the original model fit
   if (control$save_modelFit) {
     fit <- lrt
@@ -157,6 +156,7 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
   }
 
   return(list(betahat=betahat,
+              sebetahat=rep(NA, length(betahat)),
               df=df,
               pvalue = pvalue, fit = fit))
 }

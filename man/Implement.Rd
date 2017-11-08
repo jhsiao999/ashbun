@@ -5,7 +5,7 @@
 \alias{methodWrapper.rots}
 \title{MAST}
 \usage{
-methodWrapper.mast(counts, condition, pseudocount = 0.5,
+methodWrapper.mast(counts, condition, default = FALSE, pseudocount = 0.5,
   control = list(save_modelFit = FALSE, include_cdr = TRUE))
 
 methodWrapper.rots(counts, condition, control = list(save_modelFit = FALSE,

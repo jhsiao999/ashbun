@@ -83,7 +83,10 @@ methodWrapper.bpsc <- function(counts, condition,
     fit <- NULL
   }
 
-  return(list(pvalue = pvalue,
+  return(list(betahat=rep(NA, length(pvalue)),
+              sebetahat=rep(NA, length(pvalue)),
+              df=rep(NA, length(pvalue)),
+              pvalue = pvalue,
               fit=fit))
 }
 
@@ -140,19 +143,19 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     rowData <- data.frame(gene = rownames(counts))
     sca <- MAST::FromMatrix(counts.cpm, colData, rowData)
     
-    # calculate cellualr detection rate; normalized to mean 0 and sd 1
-    colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
     
     # adaptive threshold in MAST
-    thres <- thresholdSCRNACountMatrix(assay(sca), nbins = 20, min_per_bin = 30,
-                                       data_log=FALSE)
+    thres <- thresholdSCRNACountMatrix(assay(sca), data_log=FALSE)
     
-    freq_expressed <- .2
+    freq_expressed <- .1
     
     assays(sca) <- list(thresh=thres$counts_threshold, cpm=counts.cpm)
     expressed_genes <- freq(sca) > freq_expressed
     sca <- sca[expressed_genes,]
     
+    # calculate cellualr detection rate; normalized to mean 0 and sd 1
+    colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
+
     # the default method for fitting is bayesGLM
     fit <- MAST::zlm(~ condition + cdr.normed, sca)
   }

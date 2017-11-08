@@ -5,7 +5,7 @@
 \title{limma + voom}
 \usage{
 methodWrapper.limmaVoom(counts, condition, pseudocount = 0.5,
-  control = list(save_modelFit = FALSE))
+  default = FALSE, control = list(save_modelFit = FALSE))
 }
 \arguments{
 \item{counts}{normalized gene by sample expression count matrix. (CPM)}

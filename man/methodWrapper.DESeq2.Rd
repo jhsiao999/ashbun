@@ -5,8 +5,8 @@
 \title{DESeq2}
 \usage{
 methodWrapper.DESeq2(counts, condition, libsize_factors = NULL,
-  control = list(save_modelFit = FALSE, independentFiltering = FALSE,
-  cooksCutoff = FALSE))
+  default = FALSE, control = list(save_modelFit = FALSE,
+  independentFiltering = FALSE, cooksCutoff = FALSE))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}

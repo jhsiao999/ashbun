@@ -5,7 +5,7 @@
 \title{edgeR}
 \usage{
 methodWrapper.edgeR(counts, condition, libsize_factors = NULL,
-  control = list(save_modelFit = FALSE))
+  default = FALSE, control = list(save_modelFit = FALSE))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N).}

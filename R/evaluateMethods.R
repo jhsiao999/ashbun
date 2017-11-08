@@ -152,12 +152,6 @@ query.pipeline <- function(counts, condition, is_nullgene = NULL,
                                                      "BPSC", "MAST", "ROTS", "scde")) {
 #                           thresholdDetection = 1, fractionExpressed = .01) {
 
-  #----- filtering
-#  data_filtered <- filter.Wrapper(counts = counts,
-#                                  condition = condition,
-#                                  thresholdDetection = thresholdDetection,
-#                                  fractionExpressed = fractionExpressed,
-#                                  is_nullgene = is_nullgene)
   data_filtered <- list(counts = counts,
                         condition = condition,
                         is_nullgene = is_nullgene)

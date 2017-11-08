@@ -4,8 +4,9 @@
 \alias{methodWrapper.bpsc}
 \title{BPSC}
 \usage{
-methodWrapper.bpsc(counts, condition, control = list(save_modelFit = FALSE,
-  estIntPar = FALSE, useParallel = TRUE))
+methodWrapper.bpsc(counts, condition, default = FALSE,
+  control = list(save_modelFit = FALSE, estIntPar = FALSE, useParallel =
+  TRUE))
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). BPSC requires this input
