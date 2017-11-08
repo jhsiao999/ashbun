@@ -41,21 +41,22 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   if (!is.factor(condition)) {condition <- factor(condition)}
 
   #<--------------------------------------
-  suppressPackageStartupMessages(library(DESeq2))
-  # Make "DESeqDataSet" object
   dds <- DESeq2::DESeqDataSetFromMatrix(counts, S4Vectors::DataFrame(condition), ~ condition)
 
-  # input size factors
-  dds <- DESeq2::estimateSizeFactors(dds)
-  # sizeFactors(dds) <- libsize_factors
-  # colData(dds)[["sizeFactor"]] <- libsize_factors
-  # SummarizedExperiment::colData(dds) <- S4Vectors::DataFrame(condition,
-  # sizeFactor =  libsize_factors)
-  names(libsize_factors) <- colnames(counts)
-  dds@colData@listData$sizeFactor <- libsize_factors
-
+  # input pre-defined size factor    
+  if (!is.null(libsize_factors)) {
+    dds <- DESeq2::estimateSizeFactors(dds)
+    names(libsize_factors) <- colnames(counts)
+    dds@colData@listData$sizeFactor <- libsize_factors
+  }
+  
+  # use DESeq size factor
+  if (is.null(libsize_factors)) {
+    dds <- DESeq2::estimateSizeFactors(dds)
+  }
+  
   # Run DE analysis
-  dds <- DESeq(dds, quiet = FALSE)
+  dds <- DESeq(dds, quiet = TRUE)
 
   # Call results table without any arguments
   # this will extract the estimated log2 fold changes and p values for the
@@ -66,6 +67,7 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
 
   betahat <- res$log2FoldChange
   sebetahat <- res$lfcSE
+  df <- ncol(model.matrix(design(dds), colData(dds)))
   pvalue <- res$pvalue
 
   # if save_modelFit, then output will include the original model fit
@@ -76,6 +78,7 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
   }
 
   return(list(betahat=betahat, sebetahat=sebetahat,
+              df=df,
               pvalue = pvalue, fit = fit))
 }
 
