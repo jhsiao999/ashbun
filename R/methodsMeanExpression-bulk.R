@@ -187,6 +187,7 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
 #'
 #' @export
 methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
+                                    default = FALSE,
                                     control = list(save_modelFit = FALSE)){
 
   #--------------------------
@@ -196,10 +197,6 @@ methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
   counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
 
-  # This gives erros... don't know why...
-  # assertthat::assert_that(length(unique(condition)) != 2,
-  #                         msg = "condition vector only allows 2 groups")
-
   # convert condition to factor
   if (!is.factor(condition)) {condition <- factor(condition)}
 
@@ -207,22 +204,31 @@ methodWrapper.limmaVoom <- function(counts, condition, pseudocount = .5,
   # create design matrix
   design <- model.matrix(~condition)
 
-  # compute log2CPM
-  if (is.null(pseudocount)) {
-    log2CPM <- log2(counts)
-  } else {
-    log2CPM <- log2(counts + pseudocount)
-  }
-
   suppressPackageStartupMessages(library(limma))
-  # don't apply normalization methods (eg., TMM, quantile)
-  # the default setting of voom.controlPseudocount is the same as
-  # in voom package; but here we made pseudocount and pseudo library size
-  # adjustable by users
-  weights <- voom.controlPseudocount(counts, design)
-  fit <- limma::lmFit(log2CPM, design, weights = weights)
-  fit.ebayes <- limma::eBayes(fit)
 
+  if (default==FALSE) {
+    # compute log2CPM
+    if (is.null(pseudocount)) {
+      log2CPM <- log2(counts)
+    } else {
+      log2CPM <- log2(counts + pseudocount)
+    }
+    
+    # don't apply normalization methods (eg., TMM, quantile)
+    # the default setting of voom.controlPseudocount is the same as
+    # in voom package; but here we made pseudocount and pseudo library size
+    # adjustable by users
+    weights <- voom.controlPseudocount(counts, design)
+    fit <- limma::lmFit(log2CPM, design, weights = weights)
+    fit.ebayes <- limma::eBayes(fit)
+  }
+  
+  if (default==TRUE) {
+    v <- voom(counts, design, plot = FALSE)
+    fit <- lmFit(v, design)
+    fit.ebayes <- limma::eBayes(fit)
+  }
+  
   # given that the condition is a binary vector
   # extract the coefficient corresponds to the difference between the two conditions
   betahat <- fit.ebayes$coefficients[,2]
