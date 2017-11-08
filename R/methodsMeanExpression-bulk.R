@@ -146,6 +146,7 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
   lrt <- edgeR::glmLRT(fit, coef = 2)
 
   betahat <- lrt$coefficients[,2]
+  df <- lrt$df.residual
   pvalue <- lrt$table$PValue
 
   # if save_modelFit, then output will include the original model fit
@@ -156,6 +157,7 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
   }
 
   return(list(betahat=betahat,
+              df=df,
               pvalue = pvalue, fit = fit))
 }
 
