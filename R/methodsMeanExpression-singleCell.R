@@ -116,7 +116,7 @@ methodWrapper.bpsc <- function(counts, condition,
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
-methodWrapper.mast <- function(counts, condition,
+methodWrapper.mast <- function(counts, condition, default = FALSE,
                                pseudocount = .5,
                                control = list(save_modelFit = FALSE,
                                               include_cdr = TRUE)) {
@@ -127,29 +127,57 @@ methodWrapper.mast <- function(counts, condition,
 
   counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
-
-  #<--------------------------------------
-
-  # compute log2CPM
-  log2CPM <- log2(counts + pseudocount)
-
+  
   suppressPackageStartupMessages(library(MAST))
-  # make data.frame into singleCellAssay object
-  colData <- data.frame(condition = condition)
-  rowData <- data.frame(gene = rownames(counts))
-  sca <- suppressMessages(MAST::FromMatrix(log2CPM, colData, rowData))
-
-  if (control$include_cdr) {
+  
+  #<--------------------------------------
+  if (default == TRUE) {
+    # compute log2CPM
+    counts.cpm <- normalize.cpm(counts)$cpm
+    
+    # make data.frame into singleCellAssay object
+    colData <- data.frame(condition = condition)
+    rowData <- data.frame(gene = rownames(counts))
+    sca <- MAST::FromMatrix(counts.cpm, colData, rowData)
+    
     # calculate cellualr detection rate; normalized to mean 0 and sd 1
     colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
+    
+    # adaptive threshold in MAST
+    thres <- thresholdSCRNACountMatrix(assay(sca), nbins = 20, min_per_bin = 30,
+                                       data_log=FALSE)
+    
+    freq_expressed <- .2
+    
+    assays(sca) <- list(thresh=thres$counts_threshold, cpm=counts.cpm)
+    expressed_genes <- freq(sca) > freq_expressed
+    sca <- sca[expressed_genes,]
+    
     # the default method for fitting is bayesGLM
-    fit <- suppressMessages(MAST::zlm(~ condition + cdr.normed, sca))
-  } else {
-    fit <-  suppressMessages(MAST::zlm(~ condition, sca))
+    fit <- MAST::zlm(~ condition + cdr.normed, sca)
+  }
+  
+  if (default == FALSE) {
+    # compute log2CPM
+    log2CPM <- log2(counts + pseudocount)
+    
+    # make data.frame into singleCellAssay object
+    colData <- data.frame(condition = condition)
+    rowData <- data.frame(gene = rownames(counts))
+    sca <- suppressMessages(MAST::FromMatrix(log2CPM, colData, rowData))
+    
+    if (control$include_cdr) {
+      # calculate cellualr detection rate; normalized to mean 0 and sd 1
+      colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
+      # the default method for fitting is bayesGLM
+      fit <- MAST::zlm(~ condition + cdr.normed, sca)
+    } else {
+      fit <-  MAST::zlm(~ condition, sca)
+    }
   }
 
   # LRT test for the significance of the condition effect
-  lrt <-  suppressMessages(MAST::lrTest(fit, "condition"))
+  lrt <-  MAST::lrTest(fit, "condition")
 
   # extract p.value from their "hurdle" model
   pvalue <- lrt[,3,3]
