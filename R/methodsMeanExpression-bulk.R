@@ -67,7 +67,7 @@ methodWrapper.DESeq2 <- function(counts, condition, libsize_factors = NULL,
 
   betahat <- res$log2FoldChange
   sebetahat <- res$lfcSE
-  df <- ncol(model.matrix(design(dds), colData(dds)))
+  df <- nrow(colData(dds)) - ncol(model.matrix(design(dds)))
   pvalue <- res$pvalue
 
   # if save_modelFit, then output will include the original model fit
@@ -122,10 +122,18 @@ methodWrapper.edgeR <- function(counts, condition, libsize_factors = NULL,
 
   #<--------------------------------------
   # Make "DGEList" object
-  dge <- edgeR::DGEList(counts = counts,
-                        group = condition,
-                        genes = rownames(counts),
-                        norm.factors = libsize_factors)
+  if (!is.null(libsize_factors)) {
+    dge <- edgeR::DGEList(counts = counts,
+                          group = condition,
+                          genes = rownames(counts),
+                          norm.factors = libsize_factors)
+  }
+  if (is.null(libsize_factors)) {
+    dge <- edgeR::DGEList(counts = counts,
+                          group = condition,
+                          genes = rownames(counts))
+    dge <- calcNormFactors(dge, method = "TMM")
+  }
 
   # estimate dispersion
   dge <- edgeR::estimateDisp(dge, design = model.matrix(~condition), robust = TRUE)
