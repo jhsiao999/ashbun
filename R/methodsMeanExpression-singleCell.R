@@ -27,6 +27,7 @@
 #'
 #' @export
 methodWrapper.bpsc <- function(counts, condition,
+                               default = FALSE,
                                control = list(save_modelFit = FALSE,
                                               estIntPar = FALSE,
                                               useParallel = TRUE)) {
@@ -46,17 +47,32 @@ methodWrapper.bpsc <- function(counts, condition,
   # Create a design matrix including hte group labels, batch effectd
   # can be added here if they are available
   design <- model.matrix(~condition)
+  
+  if (default == FALSE) {
+    # Model fitting; estIntPar requires to use only the expressed genes
+    # to compute estiamtes, according to the vignette, this option requires longer
+    # computational time
+    fit <- BPSC::BPglm(data = counts,
+                       controlIds = controlIds,
+                       design = design,
+                       coef = 2,
+                       estIntPar = control$estIntPar,
+                       useParallel = control$useParallel)
+  }
 
-  # Model fitting; estIntPar requires to use only the expressed genes
-  # to compute estiamtes, according to the vignette, this option requires longer
-  # computational time
-  fit <- BPSC::BPglm(data = counts,
-                     controlIds = controlIds,
-                     design = design,
-                     coef = 2,
-                     estIntPar = control$estIntPar,
-                     useParallel = control$useParallel)
-
+  if (default == TRUE) {
+    # Model fitting; estIntPar requires to use only the expressed genes
+    # to compute estiamtes, according to the vignette, this option requires longer
+    # computational time
+    counts.cpm <- normalize.cpm(counts)
+    fit <- BPSC::BPglm(data = counts.cpm$cpm,
+                       controlIds = controlIds,
+                       design = design,
+                       coef = 2,
+                       estIntPar = TRUE,
+                       useParallel = control$useParallel)
+  }
+  
   # extract results
   pvalue <- fit$PVAL
 
