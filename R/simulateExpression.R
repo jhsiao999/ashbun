@@ -275,6 +275,128 @@ simulationWrapper <- function(counts,
   })
 }
 
+#' @title simulation wrapper with flexible gene sampling method
+#' 
+#' @export
+simulationWrapper.sampleGenes <- function(counts,
+                              Nsim = 1, Nsamples = 50, Ngenes = NULL,
+                              pi0 = NULL,
+                              sample_method = c("all_genes", "per_gene"),
+                              sampleGenes_method = c("high", "medium", "low"),
+                              beta_args = args.big_normal(betapi = c(1),
+                                                          betamu = c(0),
+                                                          betasd = c(1))) {
+  simdata <- lapply(1:Nsim, function(i) {
+    #  set.seed(999*i)
+    if (pi0 == 1) {
+      foo <- makeSimCount2groups(counts = counts,
+                                 Nsamples = Nsamples, Ngenes = Ngenes,
+                                 sample_method = sample_method)
+      return(foo)
+    }
+    
+    if (pi0 < 1) {
+      foo <- makeSimCount2groups.sampleGenes(counts = counts,
+                                 Nsamples = Nsamples, Ngenes = Ngenes,
+                                 sample_method = sample_method,
+                                 sampleGenes_method = sampleGenes_method)
+      foo2 <- non_null_sim(counts = foo$counts,
+                           condition = foo$condition,
+                           pi0,
+                           beta_args = beta_args)
+      return(foo2)
+    }
+  })
+}
+
+
+#' Sample genes
+#' 
+#' @description Methods for sampling genes
+#' 
+#' @export
+sampleGenes <- function(counts, Ngenes, method = c("high", "medium", "low")) {
+  quants <- quantile(rowMeans(counts))
+  if (method == "high") {
+    ind <- which(rowMeans(counts) > quants[4])
+  }
+  
+  if (method == "medium") {
+    ind <- which(rowMeans(counts) > quants[2] &
+                   (rowMeans(counts) < quants[4]))
+  }
+  if (method == "low") {
+    ind <- which(rowMeans(counts) < quants[2])
+  }
+  
+  if (length(ind) > Ngenes) {
+    ind <- sample(ind, Ngenes, replace = FALSE)
+  }  
+  return(ind)
+}
+
+
+#' @title Generate count matrix for genes of different expression levels
+#'
+#' @param counts Gene expression count matrix from a dataset.
+#' @param Ngenes Number of genes in the simulated dataset.
+#' @param Nsample Number of samples in each condition.
+#' @param pi0 Proportion of null genes. Default to be 1.
+#'
+#' @export
+makeSimCount2groups.sampleGenes <- function(counts, Ngenes = NULL, Nsamples = 50,
+                                sampleGenes_method = c("high", "medium", "low"),
+                                sample_method = c("per_gene", "all_genes")){
+  output <- list(counts = counts)
+  Nsamples_total <- 2*Nsamples
+  
+  if (sample_method == "per_gene") {
+    # For each gene, randomly select 2*Nsamp samples from counts
+    counts_subset <- t(apply(counts, 1, sampleingene, Nsamples_total=Nsamples_total))
+    # Remove genes without any reads
+    if ( sum(apply(counts_subset,1,sum) == 0) > 0) {
+      counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
+    } else {
+      counts_subset <- counts_subset
+    }
+    # #Ngenes <- NROW(counts_subset)
+    # output$counts <- counts_subset
+  }
+  
+  if (sample_method == "all_genes") {
+    samples_to_include <- sample((1:NCOL(counts)), Nsamples_total, replace = TRUE)
+    counts_subset <- counts[, samples_to_include]
+    # Remove genes without any reads
+    counts_subset <- counts_subset[which(apply(counts_subset,1,sum)>0), ]
+    # #Ngenes <- NROW(counts_subset)
+    # output$counts <- counts_subset
+  }
+  
+  if (!is.null(Ngenes)) {
+    # genes_to_include <- sample(1:NROW(counts_subset), Ngenes, replace = FALSE)
+    genesToInclude <- sampleGenes(counts_subset, Ngenes, method = sampleGenes_method)
+    counts_subset <- counts_subset[genesToInclude, ]
+    output$counts <- counts_subset
+  } else {
+    output$counts <- counts_subset
+  }
+  
+  # assign samples to 2 arbitrary conditions
+  condition <- rep(1:2, each = Nsamples)
+  condition <- condition[sample(1:(Nsamples_total), size = Nsamples_total)]
+  output$condition <- condition
+  
+  # reorder sample columns
+  output$condition <- output$condition[order(output$condition)]
+  output$counts <- output$counts[, order(output$condition)]
+  
+  # make colnames be unique
+  colnames(output$counts) <- paste0("sample_",c(1:dim(output$counts)[2]))
+  
+  return(output)
+}
+
+
 
 #' @title Generate count matrix of all null genes
 #'
