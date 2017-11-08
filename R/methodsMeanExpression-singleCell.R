@@ -164,7 +164,7 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     # make data.frame into singleCellAssay object
     colData <- data.frame(condition = condition)
     rowData <- data.frame(gene = rownames(counts))
-    sca <- suppressMessages(MAST::FromMatrix(log2CPM, colData, rowData))
+    sca <- MAST::FromMatrix(log2CPM, colData, rowData)
     
     if (control$include_cdr) {
       # calculate cellualr detection rate; normalized to mean 0 and sd 1
@@ -243,13 +243,15 @@ methodWrapper.rots <- function(counts, condition,
   counts <- as.matrix(counts)
 
   #<--------------------------------------
+  suppressPackageStartupMessages(library(ROTS))
+  
   # fitting model
-  fit <- suppressMessages( ROTS::ROTS(data = counts,
-                                      groups = condition,
-                                      B = control$B,
-                                      K = dim(counts)[1],
-                                      seed = NULL,
-                                      log = FALSE) )
+  fit <- ROTS::ROTS(data = counts,
+                     groups = condition,
+                      B = control$B,
+                      K = dim(counts)[1],
+                      seed = NULL,
+                      log = FALSE) 
 
   # extract results
   pvalue <- fit$pvalue
