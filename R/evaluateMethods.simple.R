@@ -52,8 +52,12 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
                                     report.control = list(fdr_control_threshold = .05), 
                                     nsim = NULL) {
   
+  library(ashr)
+  
   names(is_nullgene) <- rownames(counts)
   
+  message("Simulation data", nsim, "\n")
+
   results <- query.methodsMeanExpression.simple(counts, condition, is_nullgene,
                   default = TRUE,
                   methodsMeanExpression = methodsMeanExpression)
