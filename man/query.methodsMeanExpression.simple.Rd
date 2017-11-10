@@ -5,8 +5,7 @@
 \title{Runs multiple DE methods under their default setting}
 \usage{
 query.methodsMeanExpression.simple(counts, condition, is_nullgene,
-  default = TRUE, methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom",
-  "BPSC", "MAST"))
+  default = TRUE, methodsMeanExpression)
 }
 \arguments{
 \item{counts}{Gene by sample expression count matrix (G by N). Use filtered count data.}

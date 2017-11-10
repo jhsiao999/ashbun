@@ -4,8 +4,7 @@
 \alias{query.evaluation.simple}
 \title{Evaluate multiple normalization methods and multiple DE methods}
 \usage{
-query.evaluation.simple(counts, condition, is_nullgene,
-  methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom", "BPSC", "MAST"),
+query.evaluation.simple(counts, condition, is_nullgene, methodsMeanExpression,
   report.control = list(fdr_control_threshold = 0.05), nsim = NULL)
 }
 \arguments{

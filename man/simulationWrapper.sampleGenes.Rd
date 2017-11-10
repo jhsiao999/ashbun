@@ -7,5 +7,5 @@
 simulationWrapper.sampleGenes(counts, Nsim = 1, Nsamples = 50,
   Ngenes = NULL, pi0 = NULL, sample_method = c("all_genes", "per_gene"),
   sampleGenes_method = c("high", "medium", "low"),
-  beta_args = args.big_normal(betapi = c(1), betamu = c(0), betasd = c(1)))
+  beta_args = args.big_normal(betapi = c(1), betamu = c(0), betasd = c(0.8)))
 }
