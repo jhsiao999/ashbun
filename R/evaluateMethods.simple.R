@@ -56,7 +56,7 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
   
   names(is_nullgene) <- rownames(counts)
   
-  message("Simulation data", nsim, "\n")
+  message("Simulation data ", nsim, "\n")
 
   results <- query.methodsMeanExpression.simple(counts, condition, is_nullgene,
                   default = TRUE,
