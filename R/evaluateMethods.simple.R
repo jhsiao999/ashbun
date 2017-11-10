@@ -194,49 +194,51 @@ query.methodsMeanExpression.simple <- function(counts, condition,
   output <- vector("list", length = length(which_methods))
   names(output) <- methods[which_methods]
   
+  print(names(output))
+
   if ("DESeq2" %in% names(output)) {
     cat("DESeq2", "\n")
     output[["DESeq2"]] <- methodWrapper.DESeq2(counts, condition, libsize_factors = NULL,
                              default = TRUE,
                              control = list(save_modelFit = FALSE,
                                             independentFiltering = TRUE,
-                                            cooksCutoff = TRUE))    
+                                            cooksCutoff = TRUE))
   }
 
   if ("edgeR" %in% names(output)) {
     cat("edgeR", "\n")
     output[["edgeR"]] <- methodWrapper.edgeR(counts, condition, libsize_factors = NULL,
                              default = TRUE,
-                             control = list(save_modelFit = FALSE))    
+                             control = list(save_modelFit = FALSE))
   }
-  
+
   if ("limmaVoom" %in% names(output)) {
     cat("limmaVoom", "\n")
-    output[["limmaVoom"]] <- methodWrapper.limmaVoom(counts, condition, 
+    output[["limmaVoom"]] <- methodWrapper.limmaVoom(counts, condition,
                                 default = TRUE,
-                                control = list(save_modelFit = FALSE))    
+                                control = list(save_modelFit = FALSE))
   }
-  
+
   if ("BPSC" %in% names(output)) {
     cat("BPSC", "\n")
     output[["BPSC"]] <- methodWrapper.bpsc(counts, condition,
                                            default=TRUE,
                                            control = list(save_modelFit = FALSE,
                                                           estIntPar = TRUE,
-                                                          useParallel = TRUE))    
+                                                          useParallel = TRUE))
   }
-  
+
   if ("MAST" %in% names(output)) {
     cat("MAST", "\n")
     output[["MAST"]] <- methodWrapper.mast(counts, condition,
                                            default=TRUE,
                                            control = list(save_modelFit = FALSE,
-                                                          include_cdr = TRUE))    
+                                                          include_cdr = TRUE))
   }
-  
+
   res_longformat <- vector("list", length(methodsMeanExpression))
   names(res_longformat) <- methodsMeanExpression
-  
+
   for (index in 1:length(methodsMeanExpression)) {
     res_longformat[[index]] <- data.frame(genes=names(output[[index]]$pvalue),
                                 pvalues=output[[index]]$pvalue,
@@ -247,7 +249,7 @@ query.methodsMeanExpression.simple <- function(counts, condition,
                                                           length(output[[index]]$pvalue)))
   }
   res_longformat <- do.call(rbind, res_longformat)
-  
+
   return(list(data = list(counts=counts,
                           condition=condition,
                           is_nullgene=is_nullgene),
