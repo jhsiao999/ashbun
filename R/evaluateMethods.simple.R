@@ -48,8 +48,7 @@
 #'
 #' @export
 query.evaluation.simple <- function(counts, condition, is_nullgene,
-                                    methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom",
-                                                              "BPSC", "MAST"),
+                                    methodsMeanExpression,
                                     report.control = list(fdr_control_threshold = .05), 
                                     nsim = NULL) {
   
@@ -57,8 +56,7 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
   
   results <- query.methodsMeanExpression.simple(counts, condition, is_nullgene,
                   default = TRUE,
-                  methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom",
-                                             "BPSC", "MAST"))
+                  methodsMeanExpression = methodsMeanExpression)
   message("Analysis done!", "\n")
   
 
@@ -179,8 +177,7 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
 #' @export
 query.methodsMeanExpression.simple <- function(counts, condition, 
                                   is_nullgene, default = TRUE,
-                                  methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom",
-                                                            "BPSC", "MAST")) {
+                                  methodsMeanExpression) {
   
   names(is_nullgene) <- rownames(counts)
   

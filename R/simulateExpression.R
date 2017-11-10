@@ -285,11 +285,11 @@ simulationWrapper.sampleGenes <- function(counts,
                               sampleGenes_method = c("high", "medium", "low"),
                               beta_args = args.big_normal(betapi = c(1),
                                                           betamu = c(0),
-                                                          betasd = c(1))) {
+                                                          betasd = c(.8))) {
   simdata <- lapply(1:Nsim, function(i) {
     #  set.seed(999*i)
     if (pi0 == 1) {
-      foo <- makeSimCount2groups(counts = counts,
+      foo <- makeSimCount2groups.sampleGenes(counts = counts,
                                  Nsamples = Nsamples, Ngenes = Ngenes,
                                  sample_method = sample_method)
       return(foo)
