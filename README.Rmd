@@ -1,0 +1,28 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# Benchmarking methods for differential expression analysis in single cell data
+
+This project focus on realistic evaluations of single cell data manufactured from experimental datasets from different technologies, organisms and cell types. 
+
+
+## Installation
+
+To Install, run in R
+
+```{r, eval = TRUE}
+devtools::install_github("jhsiao999/ashbun")
+```
+
+
