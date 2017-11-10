@@ -65,7 +65,7 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
   output <- vector("list", 3)
   names(output) <- c("fdr_control", "roc", "pi0")
   
-  list_methodsMeanExpression <- as.character(unique(pval_summarize$methodsMeanExpression))
+  list_methodsMeanExpression <- as.character(unique(results$res_longformat$methodsMeanExpression))
   
   # how well the method calibrates (FDR control) at pvalue < .05
   pval_summarize <- results$res_longformat
