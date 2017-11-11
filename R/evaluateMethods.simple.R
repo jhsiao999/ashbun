@@ -83,7 +83,7 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
         df_sub <- df_sub[!is.na(df_sub$pvalues),]
         df_sig <- df_sub[df_sub$pvalues < report.control$fdr_control_threshold, ]
         
-        foo <- data.frame(fdr_control = sum(df_sig$is_nullgene)/nrow(df_sig),
+        foo <- data.frame(fdr_control = sum(!df_sig$is_nullgene)/nrow(df_sig),
                           methodsMeanExpression = list_methodsMeanExpression[index_meanExpression])
         return(foo)
       }) )
