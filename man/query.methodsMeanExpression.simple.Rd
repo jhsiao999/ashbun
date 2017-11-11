@@ -19,38 +19,6 @@ c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")}
 (typicall CPM with normlized library size).}
 
 \item{libsize_factors}{Numeric vector of scale factors for library size factors.}
-
-\item{control}{\code{pseudocount} Default .5. For limmaVoom and MAST. If NULL, then do not use pseudocount.}
-}
-\value{
-\code{pvalues} data.frame of significance values. Columns corresond to input methods.
-}
-\examples{
-ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
-condition <- pData(ipsc_eset)$replicate
-
------ Step 1: filtering
-counts_filtered <- filter.excludeAllZeros(counts)
-featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
-                                                     thresholdDetection = 1,
-                                                     fractionExpressed = .01)$index_filter
-
-samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
-                                                     thresholdDetection = 1,
-                                                     fractionExpressed = .01)$index_filter
-
-counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
-
----- Step 2: compute library size factors
-libsize_factors <- normalize.scran(counts = counts_filtered)$libsize_factors
-counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
-
----- Step 3: run DE methods
-pvals_list <- query.methodsMeanExpression.simple(counts = counts_,
-                condition = condition_filtered,
-                default=TRUE,
-                methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom","BPSC", "MAST"))
 }
 \author{
 Chiaowen Joyce Hsiao

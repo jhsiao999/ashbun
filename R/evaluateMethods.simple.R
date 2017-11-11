@@ -14,36 +14,6 @@
 
 #' @title Evaluate multiple normalization methods and multiple DE methods
 #'
-#' @param thresholdDetection minimum count per gene/sample. Default value = 1.
-#' @param fractionExpressed fraction of samples expressed (above thresholdDetection).
-#'        Default value = .01.
-#'
-#' @examples
-#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), ), ]
-#'
-#' #---- generat simulated datasets
-#' library(ashbun)
-#' simdata_list <- simulationWrapper(counts, Nsim = 2,
-#'                                  Ngenes = 100,
-#'                                  Nsam = 20,
-#'                                  sample_method = "all_genes",
-#'                                  pi0 = .5,
-#'                                  beta_args = args.big_normal(betapi = 1,
-#'                                                              betamu = 0, betasd = .8))
-#'
-#' #---- extract a single dataset as an example
-#' #---- take pi0 = .9, the first simulated data
-#' simdata <- simdata_list[[1]]
-#'
-#' # ---- gather evaluation results
-#' eval_ouptut <- query.evaluation(counts = simdata$counts,
-#'                                 condition = simdata$condition,
-#'                                 is_nullgene = simdata$is_nullgene,
-#'                                 methodsNormalize = c("TMM", "RLE"),
-#'                                 methodsMeanExpression = c("DESeq2", "limmaVoom"),
-#'                                 report = "fdr_cutoff_summary")
-#'
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
@@ -144,38 +114,6 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
 #' @param methodsMeanExpression Chararacter vector of evaluted methods. To run all methods, use
 #'                             c("DESeq2", "limmaVoom", "edgeR","BPSC", "MAST", "ROTS")
 #'
-#' @param control
-#'   \code{pseudocount} Default .5. For limmaVoom and MAST. If NULL, then do not use pseudocount.
-#'
-#' @return
-#'    \code{pvalues} data.frame of significance values. Columns corresond to input methods.
-
-#' @examples
-#' ipsc_eset <- get(load(system.file("testdata", "HumanTungiPSC.rda", package = "ashbun")))
-#' counts <- exprs(ipsc_eset)[sample(nrow(exprs(ipsc_eset)), 500), ]
-#' condition <- pData(ipsc_eset)$replicate
-#'
-#' ----- Step 1: filtering
-#' counts_filtered <- filter.excludeAllZeros(counts)
-#' featuresToInclude <- filterFeatures.fractionExpressed(counts_filtered,
-#'                                                      thresholdDetection = 1,
-#'                                                      fractionExpressed = .01)$index_filter
-#'
-#' samplesToInclude <-  filterSamples.fractionExpressed(counts_filtered,
-#'                                                      thresholdDetection = 1,
-#'                                                      fractionExpressed = .01)$index_filter
-#'
-#' counts_filtered <- counts_filtered[featuresToInclude, samplesToInclude]
-#'
-#' ---- Step 2: compute library size factors
-#' libsize_factors <- normalize.scran(counts = counts_filtered)$libsize_factors
-#' counts_normed <- normalize.cpm(counts_filtered, libsize_factors)$cpm
-#'
-#' ---- Step 3: run DE methods
-#' pvals_list <- query.methodsMeanExpression.simple(counts = counts_,
-#'                 condition = condition_filtered,
-#'                 default=TRUE,
-#'                 methodsMeanExpression = c("DESeq2", "edgeR", "limmaVoom","BPSC", "MAST"))
 #' @author Chiaowen Joyce Hsiao
 #'
 #' @export
