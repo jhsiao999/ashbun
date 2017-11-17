@@ -146,16 +146,17 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     if (is.null(rownames(counts))) {
       rowData <- data.frame(gene = paste0("gene.", c(1:nrow(counts))))
     }
-    rowData$gene <- as.character(rowData$gene)
+    rowData$gene <- rowData$gene
     sca <- MAST::FromMatrix(counts.cpm, colData, rowData)
     
     # adaptive threshold in MAST
     thres <- thresholdSCRNACountMatrix(assay(sca), data_log=FALSE)
     
-    freq_expressed <- .1
+    # MAST vignette default
+    freq_expressed <- .2
     
-    assays(sca) <- list(thresh=thres$counts_threshold, cpm=counts.cpm)
-    expressed_genes <- freq(sca) < freq_expressed
+    #    assays(sca) <- list(thresh=thres$counts_threshold, cpm=assay(sca))
+    expressed_genes <- freq(sca) > freq_expressed
     sca <- sca[expressed_genes,]
     
     # calculate cellualr detection rate; normalized to mean 0 and sd 1
@@ -209,7 +210,6 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
               pvalue=pvalue,
               fit=fit))
 }
-
 
 
 
