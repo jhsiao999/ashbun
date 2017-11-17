@@ -24,7 +24,12 @@ query.evaluation.simple <- function(counts, condition, is_nullgene,
   
   library(ashr)
   
-  names(is_nullgene) <- rownames(counts)
+  if (is.null(rownames(counts))) {
+    names(is_nullgene) <- paste0("gene.", c(1:nrow(counts)))
+  }
+  if (!is.null(rownames(counts))) {
+    names(is_nullgene) <- rownames(counts)
+  }
   
   message("Simulation data ", nsim, "\n")
 
