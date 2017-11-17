@@ -182,7 +182,7 @@ query.methodsMeanExpression.simple <- function(counts, condition,
   names(res_longformat) <- methodsMeanExpression
 
   for (index in 1:length(methodsMeanExpression)) {
-    res_longformat[[index]] <- data.frame(genes=names(output[[index]]$pvalue),
+    res_longformat[[index]] <- data.frame(genes=paste0("gene.",c(1:length(output[[index]]$pvalue))),
                                 pvalues=output[[index]]$pvalue,
                                 betahat=output[[index]]$betahat,
                                 sebetahat=output[[index]]$sebetahat,
