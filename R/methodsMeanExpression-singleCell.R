@@ -140,9 +140,13 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     
     # make data.frame into singleCellAssay object
     colData <- data.frame(condition = condition)
-    rowData <- data.frame(gene = rownames(counts))
+    if (!is.null(rownames(counts))) {
+      rowData <- data.frame(gene = rownames(counts))
+    }
+    if (is.null(rownames(counts))) {
+      rowData <- data.frame(gene = paste0("gene.", c(1:nrow(counts))))
+    }
     sca <- MAST::FromMatrix(counts.cpm, colData, rowData)
-    
     
     # adaptive threshold in MAST
     thres <- thresholdSCRNACountMatrix(assay(sca), data_log=FALSE)
