@@ -293,6 +293,7 @@ simulationWrapper.sampleGenes <- function(counts,
                                  Nsamples = Nsamples, Ngenes = Ngenes,
                                  sample_method = sample_method)
       rownames(foo$counts) <- paste0("gene.",c(1:nrow(foo$counts)))
+      names(foo$is_nullgene) <- rownames(foo$counts)
       return(foo)
     }
     
@@ -305,7 +306,8 @@ simulationWrapper.sampleGenes <- function(counts,
                            condition = foo$condition,
                            pi0,
                            beta_args = beta_args)
-      rownames(foo$counts) <- paste0("gene.",c(1:nrow(foo2$counts)))
+      rownames(foo2$counts) <- paste0("gene.",c(1:nrow(foo2$counts)))
+      names(foo2$is_nullgene) <- rownames(foo2$counts)
       return(foo2)
     }
   })
