@@ -292,7 +292,7 @@ simulationWrapper.sampleGenes <- function(counts,
       foo <- makeSimCount2groups.sampleGenes(counts = counts,
                                  Nsamples = Nsamples, Ngenes = Ngenes,
                                  sample_method = sample_method)
-      rownames(foo) <- paste0("gene.",c(1:nrow(counts)))
+      rownames(foo$counts) <- paste0("gene.",c(1:nrow(counts)))
       return(foo)
     }
     
@@ -305,7 +305,7 @@ simulationWrapper.sampleGenes <- function(counts,
                            condition = foo$condition,
                            pi0,
                            beta_args = beta_args)
-      rownames(foo2) <- paste0("gene.",c(1:nrow(counts)))
+      rownames(foo$counts) <- paste0("gene.",c(1:nrow(counts)))
       return(foo2)
     }
   })
