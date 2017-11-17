@@ -123,11 +123,11 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
                                pseudocount = .5,
                                control = list(save_modelFit = FALSE,
                                               include_cdr = TRUE)) {
-
+  
   #--------------------------
   # Make sure input format is correct
   assertthat::assert_that(dim(counts)[2] == length(condition))
-
+  
   counts <- as.matrix(counts)
   if (!is.factor(condition)) {condition <- factor(condition)}
   
@@ -146,6 +146,7 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     if (is.null(rownames(counts))) {
       rowData <- data.frame(gene = paste0("gene.", c(1:nrow(counts))))
     }
+    rowData$gene <- as.character(rowData$gene)
     sca <- MAST::FromMatrix(counts.cpm, colData, rowData)
     
     # adaptive threshold in MAST
@@ -154,12 +155,12 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
     freq_expressed <- .1
     
     assays(sca) <- list(thresh=thres$counts_threshold, cpm=counts.cpm)
-    expressed_genes <- freq(sca) > freq_expressed
+    expressed_genes <- freq(sca) < freq_expressed
     sca <- sca[expressed_genes,]
     
     # calculate cellualr detection rate; normalized to mean 0 and sd 1
     colData(sca)$cdr.normed <- scale(colSums(assay(sca) > 0))
-
+    
     # the default method for fitting is bayesGLM
     fit <- MAST::zlm(~ condition + cdr.normed, sca)
   }
@@ -182,32 +183,33 @@ methodWrapper.mast <- function(counts, condition, default = FALSE,
       fit <-  MAST::zlm(~ condition, sca)
     }
   }
-
+  
   # LRT test for the significance of the condition effect
   lrt <-  MAST::lrTest(fit, "condition")
-
+  
   # extract p.value from their "hurdle" model
   pvalue <- lrt[,3,3]
-
+  
   # extract effect size, standard error, and df from the non-zero component
   betahat <- fit@coefC[,2]
   setbetahat <- sqrt(sapply(1:dim(fit@vcovC)[3], function(i) {
     diag(fit@vcovC[,,i])[2]} ) )
   df <- fit@df.resid[,1]
-
+  
   # if save_modelFit, then output will include the original model fit
   if (control$save_modelFit) {
     fit <- fit
   } else {
     fit <- NULL
   }
-
+  
   return(list(betahat=betahat,
               sebetahat=setbetahat,
               df=df,
               pvalue=pvalue,
               fit=fit))
 }
+
 
 
 
