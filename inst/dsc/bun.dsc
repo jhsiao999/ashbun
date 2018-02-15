@@ -1,18 +1,14 @@
 # RNA-seq analysis
-# Joice and Gao (c) 2017
+# Joice and Gao (c) 2017 - 2018
 
 #
 # Data
 #
 
-get_counts:
-  exec: get_counts.R
-  return:
-    counts
+get_counts: get_counts.R
+  $counts: counts
 
-simulate:
-  exec: simulate.R
-  params:
+simulate: simulate.R
     counts: $counts
     Nsample: 100
     Ngenes: 1000
@@ -22,10 +18,9 @@ simulate:
     betamu: 0
     betasd: 0.8
     beta_function: args.big_normal
-  return:
-    counts = R(output$counts),
-    condition = R(output$condition),
-    null_gene = R(output$is_nullgene)
+    counts: output$counts
+    condition: output$condition
+    null_gene: output$is_nullgene
 
 #
 # Normalization
@@ -33,105 +28,68 @@ simulate:
 # Can be made more concise / flexible
 #
 
-rle:
-  exec: normalize.R
-  .alias: rle
-  params:
-    counts: $counts
-    condition: NULL
-    method: rle
-  return:
-    model = R(output$model_output),
-    libsize = R(output$libsize_factors)
+rle: normalize.R
+  counts: $counts
+  condition: NULL
+  method: rle
+  $model: output$model_output
+  $libsize: output$libsize_factors
 
 tmm(rle):
-  .alias: tmm
-  params:
-    method: tmm
+  method: tmm
 
 cpm(rle):
-  .alias: cpm
-  params:
-    method: cpm
-  return:
-    counts = R(output$cpm),
-    model = R(output$model_output),
-    libsize = R(output$libsize_factors)
+  method: cpm
+  $counts: output$cpm
 
 census(rle):
-  .alias: census
-  params:
-    method: census
-  return:
-    counts = R(output$counts_normed),
-    model = R(output$model_output),
-    libsize = R(output$libsize_factors)
+  method: census
+  $counts: output$counts_normed
 
 scnorm(rle):
-  .alias: scnorm
-  params:
-    method: scnorm
-    condition: $condition
-  return:
-    counts = R(output$counts_normed),
-    model = R(output$model_output),
-    libsize = R(output$libsize_factors)
+  method: scnorm
+  condition: $condition
+  $counts: output$counts_normed
 
 scran(rle):
-  .alias: scran
-  params:
-    method: scran
+  method: scran
 
 #
 # Mean expression
 #
-rots:
-  exec: mean.R
-  .alias: rots
-  params:
-    counts: $counts
-    condition: $condition
-    libsize: NULL
-    method: rots
-  return:
-    pvalue = R(output$pvalue),
-    fit = R(output$fit)
+rots: mean.R
+  counts: $counts
+  condition: $condition
+  libsize: NULL
+  method: rots
+  $pvalue: output$pvalue
+  $fit: output$fit
 
 bpsc(rots):
-  .alias: bpsc
-  params:
-    method: bpsc
+  method: bpsc
 
 mast(rots):
-  .alias: mast
-  params:
-    method: mast
+  method: mast
 
 scde(rots):
-  .alias: scde
-  params:
-    method: scde
+  method: scde
 
 limmaVoom(rots):
-  .alias: limmaVoom
-  params:
-    method: limmaVoom
+  method: limmaVoom
 
 DESeq2(rots):
-  .alias: DESeq2
-  params:
-    method: DESeq2
-    libsize: $libsize
+  method: DESeq2
+  libsize: $libsize
 
-edgeR(rots):
-  .alias: edgeR
-  params:
-    method: edgeR
-    libsize: $libsize
+edgeR(DESeq2):
+  method: edgeR
 
 DSC:
-  run:
-    all: get_counts * simulate * (cpm, tmm, rle, census, scnorm) * (DESeq2, edgeR, limmaVoom, bpsc, mast, rots, scde)
-  R_libs: jhsiao999/singleCellRNASeqHumanTungiPSC, Biobase, assertthat,
-          rhondabacher/SCnorm, scater, scran, edgeR, DESeq2, monocle, MAST, nghiavtr/BPSC
+  define:
+    data: get_counts * simulate
+    norm: cpm, tmm, rle, census, scnorm
+    de: DESeq2, edgeR, limmaVoom, bpsc, mast, rots, scde
+  run: data * norm * de
+  R_libs: singleCellRNASeqHumanTungiPSC@jhsiao999/singleCellRNASeqHumanTungiPSC, Biobase, assertthat,
+          SCnorm@rhondabacher/SCnorm, scater, scran, edgeR, DESeq2, monocle, MAST, BPSC@nghiavtr/BPSC
   lib_path: ../../R
