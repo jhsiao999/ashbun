@@ -18,9 +18,9 @@ simulate: simulate.R
     betamu: 0
     betasd: 0.8
     beta_function: args.big_normal
-    counts: output$counts
-    condition: output$condition
-    null_gene: output$is_nullgene
+    $counts: output$counts
+    $condition: output$condition
+    $null_gene: output$is_nullgene
 
 #
 # Normalization
